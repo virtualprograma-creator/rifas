@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-50: #edfdf5;
+  --color-brand-100: #d4f7e5;
+  --color-brand-200: #a9eecf;
+  --color-brand-300: #72dcae;
+  --color-brand-400: #34c184;
+  --color-brand-500: #129b62;
+  --color-brand-600: #087a4c;
+  --color-brand-700: #075f3d;
+  --color-brand-800: #064b32;
+  --color-brand-900: #032d20;
+
+  --color-gold-50: #fff9e6;
+  --color-gold-100: #ffefb8;
+  --color-gold-200: #ffe083;
+  --color-gold-300: #f8c94a;
+  --color-gold-400: #d9a820;
+  --color-gold-500: #b8870f;
+  --color-gold-600: #8f6708;
+  --color-gold-900: #3d2a06;
+  
+  --color-ticket-available: #16a34a;
+  --color-ticket-selected: #b8870f;
+  --color-ticket-reserved: #f59e0b;
+  --color-ticket-paid: #dc2626;
+  --color-ticket-cancelled: #6b7280;
+}
+
+:root {
+  --background: #f4f7f1;
+  --foreground: #132018;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #071710;
+    --foreground: #f7f3e3;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(184, 135, 15, 0.25);
+}
+
+.dark .glass {
+  background: rgba(6, 45, 32, 0.72);
+  border: 1px solid rgba(248, 201, 74, 0.18);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #b8870f;
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #087a4c;
+}

@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  nombre       String
+  email        String   @unique
+  passwordHash String
+  rol          String   @default("ADMIN")
+  createdAt    DateTime @default(now())
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  actorType      String   @default("SYSTEM")
+  adminEmail     String?
+  adminNombre    String?
+  action         String
+  entityType     String
+  entityId       String?
+  summary        String
+  metadata       String?
+  createdAt      DateTime @default(now())
+}
+
+model Rifa {
+  id                 String       @id @default(cuid())
+  titulo             String
+  categoria          String
+  descripcionCorta   String
+  descripcionCompleta String
+  imagenUrl          String
+  precioBoleto       Float
+  cantidadBoletos    Int
+  fechaSorteo        DateTime
+  estado             String       @default("ACTIVA")
+  razonEstado        String?
+  ganadorBoleto      String?
+  ganadorCliente     String?
+  ganadorSeleccionadoAt DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  boletos            Boleto[]
+  ordenes            Orden[]
+  metodosPago        MetodoPago[]
+}
+
+model MetodoPago {
+  id            String   @id @default(cuid())
+  banco         String
+  logoUrl       String?
+  titular       String
+  numeroTarjeta String?
+  clabe         String?
+  orden         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  rifaId        String
+  rifa          Rifa     @relation(fields: [rifaId], references: [id], onDelete: Cascade)
+  ordenes       Orden[]
+}
+
+model Boleto {
+  id               String       @id @default(cuid())
+  numero           Int
+  numeroFormateado String
+  estado           String       @default("DISPONIBLE")
+  
+  rifaId           String
+  rifa             Rifa         @relation(fields: [rifaId], references: [id], onDelete: Cascade)
+  
+  clienteId        String?
+  cliente          Cliente?     @relation(fields: [clienteId], references: [id])
+  
+  ordenId          String?
+  orden            Orden?       @relation(fields: [ordenId], references: [id])
+  
+  apartadoAt       DateTime?
+  pagadoAt         DateTime?
+  createdAt        DateTime     @default(now())
+
+  @@unique([rifaId, numero])
+}
+
+model Cliente {
+  id        String   @id @default(cuid())
+  nombre    String
+  telefono  String
+  ciudad    String
+  estado    String
+  correo    String?
+  createdAt DateTime @default(now())
+
+  boletos   Boleto[]
+  ordenes   Orden[]
+}
+
+model Orden {
+  id        String      @id @default(cuid())
+  folio     String?     @unique
+  
+  rifaId    String
+  rifa      Rifa        @relation(fields: [rifaId], references: [id])
+  
+  clienteId String
+  cliente   Cliente     @relation(fields: [clienteId], references: [id])
+
+  metodoPagoId String?
+  metodoPago   MetodoPago? @relation(fields: [metodoPagoId], references: [id])
+  
+  total     Float
+  estado    String      @default("PENDIENTE")
+  comprobanteUrl String?
+  notasPago String?
+  expiresAt DateTime?
+  pagadoAt DateTime?
+  canceladoAt DateTime?
+  
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  boletos   Boleto[]
+}
