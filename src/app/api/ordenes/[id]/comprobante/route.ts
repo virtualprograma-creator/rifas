@@ -54,6 +54,11 @@ export async function POST(request: Request, { params }: Props) {
     const fileName = `${id}-${randomUUID()}.${extension}`;
     const bytes = await file.arrayBuffer();
 
+    if (!supabase) {
+      console.error('Supabase client is not initialized. Check environment variables.');
+      return NextResponse.json({ error: 'Configuracion de la nube incompleta' }, { status: 500 });
+    }
+
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('comprobantes')
       .upload(fileName, bytes, {
