@@ -40,7 +40,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
       {/* Barra Lateral (Sidebar) */}
       <aside
-        className={`fixed inset-y-0 left-0 w-72 bg-[#052d20] text-white flex-shrink-0 z-50 border-r border-gold-500/20 transition-transform duration-300 transform lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 w-72 bg-[#052d20] text-white shrink-0 z-50 border-r border-gold-500/20 transition-transform duration-300 transform lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -52,7 +52,12 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 Control Panel
               </p>
             </div>
-            <button onClick={toggleSidebar} className="lg:hidden text-gold-300 p-2 hover:bg-white/10 rounded-lg">
+            <button 
+              onClick={toggleSidebar} 
+              className="lg:hidden text-gold-300 p-2 hover:bg-white/10 rounded-lg"
+              aria-label="Cerrar menú"
+              title="Cerrar menú"
+            >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -80,6 +85,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             <button
               onClick={toggleSidebar}
               className="lg:hidden p-2.5 bg-brand-900 text-gold-300 rounded-xl shadow-md border border-gold-500/20 active:scale-95 transition-transform"
+              aria-label="Abrir menú"
+              title="Abrir menú"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
@@ -92,7 +99,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
           <div className="flex items-center gap-3 bg-white dark:bg-[#0b2419] py-1.5 pl-4 pr-1.5 rounded-full shadow-sm border border-gold-500/10">
             <span className="text-xs font-bold text-brand-800 dark:text-brand-100/70 uppercase tracking-wider hidden xs:inline">Admin</span>
-            <div className="w-9 h-9 bg-gradient-to-br from-gold-300 to-gold-500 rounded-full flex items-center justify-center text-brand-950 font-bold shadow-inner">
+            <div className="w-9 h-9 bg-linear-to-br from-gold-300 to-gold-500 rounded-full flex items-center justify-center text-brand-950 font-bold shadow-inner">
               A
             </div>
           </div>

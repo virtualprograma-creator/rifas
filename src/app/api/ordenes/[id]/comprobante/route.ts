@@ -1,8 +1,7 @@
 import { randomUUID } from 'crypto';
-import { mkdir, writeFile } from 'fs/promises';
-import { join } from 'path';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { supabase } from '@/lib/supabase';
 import { displayFolio } from '@/lib/folio';
 import { generateAdminComprobanteMessage } from '@/lib/whatsapp';
 import { logAudit } from '@/lib/audit';
@@ -53,14 +52,25 @@ export async function POST(request: Request, { params }: Props) {
 
     const extension = file.name.split('.').pop()?.toLowerCase() || 'bin';
     const fileName = `${id}-${randomUUID()}.${extension}`;
-    const uploadDir = join(process.cwd(), 'public', 'comprobantes');
-    const filePath = join(uploadDir, fileName);
     const bytes = await file.arrayBuffer();
 
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(filePath, Buffer.from(bytes));
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('comprobantes')
+      .upload(fileName, bytes, {
+        contentType: file.type,
+        upsert: true,
+      });
 
-    const comprobanteUrl = `/comprobantes/${fileName}`;
+    if (uploadError) {
+      console.error('Error uploading to Supabase:', uploadError);
+      return NextResponse.json({ error: 'Error al subir el archivo a la nube' }, { status: 500 });
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('comprobantes')
+      .getPublicUrl(fileName);
+
+    const comprobanteUrl = publicUrl;
     await prisma.$transaction(async (tx) => {
       await tx.orden.update({
         where: { id },
