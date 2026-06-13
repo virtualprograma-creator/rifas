@@ -42,13 +42,13 @@ export default async function RifaDetailPage({ params }: Props) {
       <div className="max-w-6xl mx-auto px-4">
         {/* Header de la rifa */}
         <div className="bg-white dark:bg-[#0b2419] rounded-3xl shadow-xl overflow-hidden mb-8 border border-gold-500/10 dark:border-gold-500/5 p-6 lg:p-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Contenedor de la Imagen */}
-            <div className="lg:col-span-5 flex items-center justify-center bg-slate-50 dark:bg-slate-900/40 rounded-2xl p-4 border border-slate-100 dark:border-slate-800/80 aspect-square max-w-full overflow-hidden">
+            <div className="lg:col-span-5 flex items-center justify-center bg-slate-50 dark:bg-slate-900/40 rounded-2xl p-2 md:p-4 border border-slate-100 dark:border-slate-800/80 max-w-full overflow-hidden">
               <img 
                 src={rifa.imagenUrl || '/placeholder.jpg'} 
                 alt={rifa.titulo} 
-                className="max-w-full max-h-full w-auto h-auto object-contain rounded-xl shadow-sm transition-transform duration-300 hover:scale-[1.02]"
+                className="w-full h-auto max-h-[450px] object-contain rounded-xl shadow-sm transition-transform duration-300 hover:scale-[1.02]"
               />
             </div>
             
