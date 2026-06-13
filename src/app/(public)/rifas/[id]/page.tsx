@@ -69,7 +69,7 @@ export default async function RifaDetailPage({ params }: Props) {
                 {rifa.titulo}
               </h1>
               
-              <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed whitespace-pre-line">
                 {rifa.descripcionCompleta}
               </p>
               
