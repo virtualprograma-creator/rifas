@@ -16,6 +16,7 @@ type UpdateRifaBody = {
   precioBoleto?: string | number;
   fechaSorteo?: string;
   estado?: string;
+  razonEstado?: string;
   metodosPago?: {
     banco?: string;
     logoUrl?: string;
@@ -25,7 +26,7 @@ type UpdateRifaBody = {
   }[];
 };
 
-const ESTADOS_RIFA = new Set(['ACTIVA', 'PAUSADA', 'FINALIZADA']);
+const ESTADOS_RIFA = new Set(['ACTIVA', 'PAUSADA', 'FINALIZADA', 'CANCELADA']);
 
 export async function PATCH(req: Request, { params }: Props) {
   const { response } = await requireAdmin();
@@ -73,6 +74,7 @@ export async function PATCH(req: Request, { params }: Props) {
           precioBoleto,
           fechaSorteo: new Date(body.fechaSorteo!),
           estado,
+          razonEstado: estado === 'ACTIVA' ? null : body.razonEstado?.trim() || null,
         },
       });
 

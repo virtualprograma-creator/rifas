@@ -12,22 +12,8 @@ export function RifaQuickActions({ rifaId, estadoActual }: RifaQuickActionsProps
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const updateStatus = async (nuevoEstado: string) => {
+  const updateStatus = async (nuevoEstado: string, razonEstado = '') => {
     if (loading) return;
-    
-    let razonEstado = '';
-    
-    if (nuevoEstado === 'PAUSADA') {
-      const razon = window.prompt('¿Por qué deseas pausar esta rifa? (Aparecerá en la página pública)');
-      if (razon === null) return;
-      razonEstado = razon;
-    } else if (nuevoEstado === 'CANCELADA') {
-      const razon = window.prompt('¿Por qué deseas cancelar esta rifa? (ACCIÓN IRREVERSIBLE)');
-      if (razon === null) return;
-      razonEstado = razon;
-    } else if (nuevoEstado === 'ACTIVA') {
-      if (!window.confirm('¿Deseas reactivar esta rifa?')) return;
-    }
 
     setLoading(true);
 
@@ -41,45 +27,80 @@ export function RifaQuickActions({ rifaId, estadoActual }: RifaQuickActionsProps
       if (!response.ok) {
         const data = await response.json();
         alert(data.error || 'No se pudo actualizar el estado');
-      } else {
-        router.refresh();
+        return;
       }
-    } catch (err) {
-      alert('Error de conexión');
+
+      router.refresh();
+    } catch {
+      alert('Error de conexion');
     } finally {
       setLoading(false);
     }
   };
 
+  const pauseRifa = () => {
+    const razon = window.prompt('Por que deseas pausar esta rifa? Aparecera en la pagina publica.');
+    if (razon === null) return;
+    updateStatus('PAUSADA', razon);
+  };
+
+  const restoreRifa = () => {
+    if (!window.confirm('Deseas restaurar esta rifa y volverla activa?')) return;
+    updateStatus('ACTIVA');
+  };
+
+  const deleteRifa = () => {
+    const razon = window.prompt('Motivo para eliminar/ocultar esta rifa. Podras restaurarla despues.');
+    if (razon === null) return;
+    updateStatus('CANCELADA', razon || 'Rifa eliminada temporalmente');
+  };
+
+  const buttonBase =
+    'min-h-9 rounded-lg px-2 text-xs font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50 lg:min-h-0 lg:rounded lg:py-1';
+
+  if (estadoActual === 'CANCELADA') {
+    return (
+      <div className="grid gap-2 lg:flex lg:items-center">
+        <button
+          onClick={restoreRifa}
+          disabled={loading}
+          className={`${buttonBase} bg-green-100 text-green-700 hover:bg-green-200`}
+        >
+          {loading ? '...' : 'Restaurar'}
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex items-center gap-2">
+    <div className="grid grid-cols-2 gap-2 lg:flex lg:items-center">
       {estadoActual === 'ACTIVA' && (
-        <>
-          <button
-            onClick={() => updateStatus('PAUSADA')}
-            disabled={loading}
-            className="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-1 rounded hover:bg-amber-200 transition-colors disabled:opacity-50"
-          >
-            {loading ? '...' : 'Pausar'}
-          </button>
-          <button
-            onClick={() => updateStatus('CANCELADA')}
-            disabled={loading}
-            className="text-xs font-bold bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200 transition-colors disabled:opacity-50"
-          >
-            {loading ? '...' : 'Cancelar'}
-          </button>
-        </>
+        <button
+          onClick={pauseRifa}
+          disabled={loading}
+          className={`${buttonBase} bg-amber-100 text-amber-700 hover:bg-amber-200`}
+        >
+          {loading ? '...' : 'Pausar'}
+        </button>
       )}
+
       {estadoActual === 'PAUSADA' && (
         <button
-          onClick={() => updateStatus('ACTIVA')}
+          onClick={restoreRifa}
           disabled={loading}
-          className="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200 transition-colors disabled:opacity-50"
+          className={`${buttonBase} bg-green-100 text-green-700 hover:bg-green-200`}
         >
           {loading ? '...' : 'Activar'}
         </button>
       )}
+
+      <button
+        onClick={deleteRifa}
+        disabled={loading}
+        className={`${buttonBase} bg-red-100 text-red-700 hover:bg-red-200`}
+      >
+        {loading ? '...' : 'Eliminar'}
+      </button>
     </div>
   );
 }

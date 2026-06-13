@@ -12,11 +12,15 @@ export function WinnerButton({ rifaId }: { rifaId: string }) {
 
   const elegir = async (isAzar: boolean) => {
     if (!isAzar && !manualBoleto) {
-      setError('Ingresa un número de boleto');
+      setError('Ingresa un numero de boleto');
       return;
     }
 
-    if (!window.confirm(isAzar ? '¿Deseas elegir un ganador al azar entre los boletos pagados?' : `¿Confirmas que el boleto #${manualBoleto} es el ganador?`)) {
+    const message = isAzar
+      ? 'Deseas elegir un ganador al azar entre los boletos pagados?'
+      : `Confirmas que el boleto #${manualBoleto} es el ganador?`;
+
+    if (!window.confirm(message)) {
       return;
     }
 
@@ -24,12 +28,12 @@ export function WinnerButton({ rifaId }: { rifaId: string }) {
     setError('');
 
     try {
-      const response = await fetch(`/api/admin/rifas/${rifaId}/ganador`, { 
+      const response = await fetch(`/api/admin/rifas/${rifaId}/ganador`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ manualBoleto: isAzar ? null : manualBoleto })
+        body: JSON.stringify({ manualBoleto: isAzar ? null : manualBoleto }),
       });
-      
+
       const data = await response.json();
       setLoading(false);
 
@@ -41,48 +45,49 @@ export function WinnerButton({ rifaId }: { rifaId: string }) {
       setManualBoleto('');
       setShowManual(false);
       router.refresh();
-    } catch (err) {
-      setError('Error de conexión');
+    } catch {
+      setError('Error de conexion');
       setLoading(false);
     }
   };
 
   return (
-    <div className="space-y-4">
-      {error && <div className="rounded-lg bg-red-50 p-3 text-sm font-medium text-red-600 border border-red-100">{error}</div>}
-      
-      <div className="flex flex-wrap gap-3">
+    <div className="space-y-3">
+      {error && <div className="rounded-lg border border-red-100 bg-red-50 p-3 text-sm font-medium text-red-600">{error}</div>}
+
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <button
           type="button"
           onClick={() => elegir(true)}
           disabled={loading}
-          className="inline-flex items-center justify-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-500 disabled:opacity-60 transition-colors"
+          className="inline-flex min-h-10 items-center justify-center rounded-lg bg-brand-600 px-3 text-sm font-bold text-white transition-colors hover:bg-brand-500 disabled:opacity-60"
         >
-          {loading ? 'Procesando...' : 'Elegir al azar 🎲'}
+          {loading ? 'Procesando...' : 'Elegir al azar'}
         </button>
 
         <button
           type="button"
           onClick={() => setShowManual(!showManual)}
-          className="inline-flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-700 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+          className="inline-flex min-h-10 items-center justify-center rounded-lg bg-slate-100 px-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
         >
-          {showManual ? 'Cancelar' : 'Poner manualmente ✍️'}
+          {showManual ? 'Cancelar' : 'Poner manualmente'}
         </button>
       </div>
 
       {showManual && (
-        <div className="flex items-center gap-2 max-w-sm p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-700 animate-in fade-in slide-in-from-top-2">
+        <div className="grid gap-2 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800 sm:grid-cols-[1fr_auto]">
           <input
             type="text"
             placeholder="Ej: 054"
             value={manualBoleto}
-            onChange={(e) => setManualBoleto(e.target.value)}
-            className="flex-grow rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+            onChange={(event) => setManualBoleto(event.target.value)}
+            className="min-h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-600 dark:bg-slate-900"
           />
           <button
+            type="button"
             onClick={() => elegir(false)}
             disabled={loading}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-500 transition-colors disabled:opacity-50"
+            className="min-h-10 rounded-lg bg-green-600 px-4 text-sm font-bold text-white transition-colors hover:bg-green-500 disabled:opacity-50"
           >
             Confirmar
           </button>

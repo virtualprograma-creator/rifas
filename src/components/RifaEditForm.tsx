@@ -111,48 +111,52 @@ export function RifaEditForm({ rifa }: RifaEditFormProps) {
     router.refresh();
   };
 
-  const deleteRifa = async () => {
-    if (
-      !window.confirm(
-        '¿ESTÁS TOTALMENTE SEGURO? Esta acción es irreversible y borrará TODOS los boletos y órdenes de esta rifa del sistema.'
-      )
-    ) {
-      return;
-    }
-
+  const updateRifaStatus = async (estado: string, razonEstado = '') => {
     setLoading(true);
     setError('');
 
     try {
-      const response = await fetch(`/api/admin/rifas/${rifa.id}`, {
-        method: 'DELETE',
+      const response = await fetch(`/api/admin/rifas/${rifa.id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado, razonEstado }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'No se pudo eliminar la rifa');
+        setError(data.error || 'No se pudo actualizar la rifa');
         setLoading(false);
         return;
       }
 
-      router.push('/admin/rifas');
       router.refresh();
-    } catch (err) {
-      setError('Ocurrió un error al intentar eliminar la rifa');
+    } catch {
+      setError('Ocurrio un error al intentar actualizar la rifa');
       setLoading(false);
     }
+  };
+
+  const deleteRifa = async () => {
+    const razon = window.prompt('Motivo para eliminar/ocultar esta rifa. Podras restaurarla despues.');
+    if (razon === null) return;
+    await updateRifaStatus('CANCELADA', razon || 'Rifa eliminada temporalmente');
+  };
+
+  const restoreRifa = async () => {
+    if (!window.confirm('Deseas restaurar esta rifa y volverla activa?')) return;
+    await updateRifaStatus('ACTIVA');
   };
 
   return (
     <form
       onSubmit={submit}
-      className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 space-y-5"
+      className="space-y-5 rounded-2xl border border-slate-100 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
     >
       <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">Editar rifa</h3>
       {error && <div className="rounded-lg bg-red-50 p-3 text-sm font-medium text-red-600">{error}</div>}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input label="Titulo" name="titulo" value={formData.titulo} onChange={handleChange} required />
         <Input label="Categoria" name="categoria" value={formData.categoria} onChange={handleChange} />
         <Input
@@ -173,16 +177,16 @@ export function RifaEditForm({ rifa }: RifaEditFormProps) {
           required
         />
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Estado</label>
+          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Estado</label>
           <select
             name="estado"
             value={formData.estado}
             onChange={handleChange}
-            className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 px-4 py-2 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
           >
             <option value="ACTIVA">Activa</option>
             <option value="PAUSADA">Pausada</option>
-            <option value="CANCELADA">Cancelada</option>
+            <option value="CANCELADA">Eliminada</option>
             <option value="FINALIZADA">Finalizada</option>
           </select>
         </div>
@@ -191,7 +195,13 @@ export function RifaEditForm({ rifa }: RifaEditFormProps) {
 
       {formData.estado !== 'ACTIVA' && (
         <Input
-          label={`Motivo de ${formData.estado === 'FINALIZADA' ? 'finalización' : formData.estado.toLowerCase()}`}
+          label={`Motivo de ${
+            formData.estado === 'FINALIZADA'
+              ? 'finalizacion'
+              : formData.estado === 'CANCELADA'
+                ? 'eliminacion'
+                : formData.estado.toLowerCase()
+          }`}
           name="razonEstado"
           value={formData.razonEstado}
           onChange={handleChange}
@@ -207,7 +217,7 @@ export function RifaEditForm({ rifa }: RifaEditFormProps) {
       />
 
       <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
           Descripcion completa
         </label>
         <textarea
@@ -215,7 +225,7 @@ export function RifaEditForm({ rifa }: RifaEditFormProps) {
           value={formData.descripcionCompleta}
           onChange={handleChange}
           rows={5}
-          className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 px-4 py-2 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500"
+          className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
         />
       </div>
 
@@ -291,7 +301,7 @@ export function RifaEditForm({ rifa }: RifaEditFormProps) {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+      <div className="flex flex-col gap-4 border-t border-slate-100 pt-4 dark:border-slate-700 sm:flex-row">
         <button
           type="submit"
           disabled={loading}
@@ -299,14 +309,26 @@ export function RifaEditForm({ rifa }: RifaEditFormProps) {
         >
           {loading ? 'Guardando...' : 'Guardar cambios'}
         </button>
-        <button
-          type="button"
-          onClick={deleteRifa}
-          disabled={loading}
-          className="rounded-xl border-2 border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 px-6 py-3 font-bold hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-60 transition-colors"
-        >
-          {loading ? 'Borrando...' : 'Eliminar Rifa'}
-        </button>
+
+        {rifa.estado === 'CANCELADA' ? (
+          <button
+            type="button"
+            onClick={restoreRifa}
+            disabled={loading}
+            className="rounded-xl border-2 border-green-200 px-6 py-3 font-bold text-green-700 transition-colors hover:bg-green-50 disabled:opacity-60 dark:border-green-900/30 dark:text-green-400 dark:hover:bg-green-900/20"
+          >
+            {loading ? 'Restaurando...' : 'Restaurar rifa'}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={deleteRifa}
+            disabled={loading}
+            className="rounded-xl border-2 border-red-200 px-6 py-3 font-bold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-60 dark:border-red-900/30 dark:text-red-400 dark:hover:bg-red-900/20"
+          >
+            {loading ? 'Eliminando...' : 'Eliminar rifa'}
+          </button>
+        )}
       </div>
     </form>
   );
@@ -320,10 +342,10 @@ function Input({
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">{label}</label>
+      <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>
       <input
         {...props}
-        className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 px-4 py-2 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500"
+        className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
       />
     </div>
   );

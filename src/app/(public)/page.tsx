@@ -6,7 +6,7 @@ export const revalidate = 0;
 export default async function Home() {
   const rifas = await prisma.rifa.findMany({
     where: {
-      estado: { in: ['ACTIVA', 'PAUSADA', 'FINALIZADA', 'CANCELADA'] },
+      estado: { in: ['ACTIVA', 'PAUSADA', 'FINALIZADA'] },
     },
     orderBy: [
       { estado: 'asc' }, // ACTIVA antes que FINALIZADA
@@ -21,21 +21,21 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-[#f4f7f1] dark:bg-[#071710] pb-20">
-      <div className="bg-[#052d20] text-white py-20 px-4 relative overflow-hidden border-b border-gold-500/30">
+      <div className="relative overflow-hidden border-b border-gold-500/30 bg-[#052d20] px-4 py-10 text-white sm:py-14 lg:py-20">
         <div className="absolute inset-0 opacity-[0.08] bg-[linear-gradient(45deg,transparent_25%,#f8c94a_25%,#f8c94a_26%,transparent_26%,transparent_50%,#f8c94a_50%,#f8c94a_51%,transparent_51%,transparent_75%,#f8c94a_75%,#f8c94a_76%,transparent_76%)] bg-size-[32px_32px]"></div>
 
-        <div className="max-w-6xl mx-auto relative z-10 text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-gold-300 mb-4">Rifas premium</p>
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
+        <div className="relative z-10 mx-auto max-w-6xl text-center">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-gold-300 sm:text-sm">Rifas premium</p>
+          <h1 className="mx-auto mb-4 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-6xl">
             Participa y Gana <span className="text-gold-300">Grandes Premios</span>
           </h1>
-          <p className="text-lg md:text-xl text-brand-100 max-w-2xl mx-auto font-light">
+          <p className="mx-auto max-w-xl text-base leading-7 text-brand-100 sm:text-lg md:text-xl">
             Explora rifas activas, aparta tus boletos y vive la experiencia de una rifa clara, elegante y segura.
           </p>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 -mt-10 relative z-20">
+      <div className="relative z-20 mx-auto -mt-6 max-w-6xl px-4 sm:-mt-8 lg:-mt-10">
 
 
         {rifas.length === 0 ? (

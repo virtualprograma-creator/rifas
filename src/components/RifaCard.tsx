@@ -28,11 +28,11 @@ export function RifaCard({
 
   return (
     <div className={`bg-white dark:bg-[#0b2419] rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col h-full border ${noActiva ? 'border-amber-500/50 opacity-90' : 'border-gold-500/20'}`}>
-      <div className="relative h-48 w-full overflow-hidden">
+      <div className="relative aspect-[16/10] w-full overflow-hidden sm:aspect-[16/9]">
         <img 
           src={imagenUrl || '/placeholder.jpg'} 
           alt={titulo} 
-          className={`w-full h-full object-cover transition-transform duration-500 ${noActiva ? 'grayscale-[30%]' : 'group-hover:scale-105'}`}
+          className={`h-full w-full object-cover transition-transform duration-500 ${noActiva ? 'grayscale-[30%]' : 'group-hover:scale-105'}`}
         />
         {isFinalizada && (
           <div className="absolute inset-0 bg-black/50 backdrop-blur-[1px] flex items-center justify-center p-4">

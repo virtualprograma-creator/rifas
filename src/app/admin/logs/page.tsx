@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { AdminLayout } from '@/components/AdminLayout';
 import { prisma } from '@/lib/prisma';
 
@@ -64,24 +65,26 @@ export default async function AdminLogsPage({ searchParams }: Props) {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <section className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Log de actividad</h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Registro de cambios, eliminaciones, apartados, comprobantes, accesos y acciones administrativas.
-          </p>
+      <div className="space-y-5">
+        <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-[#101923] sm:p-5">
+          <div className="mb-4">
+            <h2 className="text-lg font-extrabold text-slate-950 dark:text-white">Log de actividad</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Registro de cambios, apartados, comprobantes, accesos y acciones administrativas.
+            </p>
+          </div>
 
-          <form className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-[1fr_160px_220px_160px_auto]">
+          <form className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-[1fr_150px_210px_150px_auto]">
             <input
               name="q"
               defaultValue={query}
-              className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+              className="min-h-11 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-700 dark:bg-slate-950/50 dark:text-white sm:col-span-2 xl:col-span-1"
               placeholder="Buscar admin, accion, resumen, folio o ID"
             />
             <select
               name="actor"
               defaultValue={actorFilter}
-              className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+              className="min-h-11 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-700 dark:bg-slate-950/50 dark:text-white"
             >
               <option value="">Todos</option>
               <option value="ADMIN">Admin</option>
@@ -91,7 +94,7 @@ export default async function AdminLogsPage({ searchParams }: Props) {
             <select
               name="action"
               defaultValue={actionFilter}
-              className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+              className="min-h-11 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-700 dark:bg-slate-950/50 dark:text-white"
             >
               <option value="">Todas las acciones</option>
               {actions.map((item) => (
@@ -103,58 +106,107 @@ export default async function AdminLogsPage({ searchParams }: Props) {
             <select
               name="entity"
               defaultValue={entityFilter}
-              className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+              className="min-h-11 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-700 dark:bg-slate-950/50 dark:text-white"
             >
               <option value="">Todo</option>
               <option value="ADMIN">Admin</option>
               <option value="RIFA">Rifa</option>
               <option value="ORDEN">Orden</option>
             </select>
-            <button className="rounded-xl bg-brand-600 px-5 py-2 font-semibold text-white hover:bg-brand-500">
+            <button className="min-h-11 rounded-lg bg-brand-500 px-5 text-sm font-bold text-white hover:bg-brand-600 sm:col-span-2 xl:col-span-1">
               Filtrar
             </button>
           </form>
         </section>
 
-        <section className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
-          <div className="overflow-x-auto">
+        <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-[#101923] sm:p-5">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h3 className="text-lg font-extrabold text-slate-950 dark:text-white">Registros</h3>
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-500 dark:bg-slate-900">
+              {logs.length}
+            </span>
+          </div>
+
+          <div className="space-y-3 lg:hidden">
+            {logs.map((log) => (
+              <article
+                key={log.id}
+                className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950/35"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h4 className="truncate text-sm font-bold text-slate-950 dark:text-white">
+                      {log.adminNombre || log.actorType}
+                    </h4>
+                    {log.adminEmail && <p className="mt-1 truncate text-xs text-slate-500">{log.adminEmail}</p>}
+                  </div>
+                  <span className={`shrink-0 rounded-full px-2 py-1 text-[11px] font-bold ${actorClass(log.actorType)}`}>
+                    {log.actorType}
+                  </span>
+                </div>
+
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="rounded-full bg-slate-200 px-2 py-1 text-[11px] font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                    {actionLabels[log.action] || log.action}
+                  </span>
+                  <span className="rounded-full bg-slate-200 px-2 py-1 text-[11px] font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                    {log.entityType}
+                  </span>
+                </div>
+
+                <p className="mt-3 text-sm leading-5 text-slate-700 dark:text-slate-200">{log.summary}</p>
+
+                <div className="mt-3 grid gap-2 text-xs text-slate-500">
+                  <div>{new Date(log.createdAt).toLocaleString('es-MX')}</div>
+                  {log.entityId && <div className="break-all">ID: {log.entityId}</div>}
+                </div>
+              </article>
+            ))}
+            {logs.length === 0 && <EmptyState />}
+          </div>
+
+          <div className="hidden overflow-x-auto lg:block">
             <table className="w-full text-left">
               <thead>
-                <tr className="border-b border-slate-200 dark:border-slate-700">
-                  <th className="px-4 py-3 text-sm font-semibold text-slate-500">Fecha</th>
-                  <th className="px-4 py-3 text-sm font-semibold text-slate-500">Actor</th>
-                  <th className="px-4 py-3 text-sm font-semibold text-slate-500">Accion</th>
-                  <th className="px-4 py-3 text-sm font-semibold text-slate-500">Entidad</th>
-                  <th className="px-4 py-3 text-sm font-semibold text-slate-500">Registro</th>
-                  <th className="px-4 py-3 text-sm font-semibold text-slate-500">Resumen</th>
+                <tr className="border-b border-slate-200 dark:border-slate-800">
+                  <TableHead>Fecha</TableHead>
+                  <TableHead>Actor</TableHead>
+                  <TableHead>Accion</TableHead>
+                  <TableHead>Entidad</TableHead>
+                  <TableHead>Registro</TableHead>
+                  <TableHead>Resumen</TableHead>
                 </tr>
               </thead>
               <tbody>
                 {logs.map((log) => (
-                  <tr key={log.id} className="border-b border-slate-100 dark:border-slate-800">
-                    <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
-                      {new Date(log.createdAt).toLocaleString('es-MX')}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="font-semibold text-slate-800 dark:text-slate-100">
-                        {log.adminNombre || log.actorType}
-                      </div>
+                  <tr key={log.id} className="border-b border-slate-100 last:border-0 dark:border-slate-800">
+                    <TableCell>{new Date(log.createdAt).toLocaleString('es-MX')}</TableCell>
+                    <TableCell>
+                      <div className="font-bold text-slate-900 dark:text-slate-100">{log.adminNombre || log.actorType}</div>
                       {log.adminEmail && <div className="text-xs text-slate-500">{log.adminEmail}</div>}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="rounded bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700 dark:bg-slate-900 dark:text-slate-200">
+                    </TableCell>
+                    <TableCell>
+                      <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
                         {actionLabels[log.action] || log.action}
                       </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{log.entityType}</td>
-                    <td className="max-w-44 break-all px-4 py-3 text-xs text-slate-500">{log.entityId || '-'}</td>
-                    <td className="px-4 py-3 text-sm text-slate-700 dark:text-slate-200">{log.summary}</td>
+                    </TableCell>
+                    <TableCell>
+                      <span className={`rounded-full px-2 py-1 text-xs font-bold ${entityClass(log.entityType)}`}>
+                        {log.entityType}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="block max-w-44 break-all text-xs text-slate-500">{log.entityId || '-'}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="block max-w-xl text-sm text-slate-700 dark:text-slate-200">{log.summary}</span>
+                    </TableCell>
                   </tr>
                 ))}
                 {logs.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-slate-500">
-                      No hay registros con esos filtros.
+                    <td colSpan={6}>
+                      <EmptyState />
                     </td>
                   </tr>
                 )}
@@ -164,5 +216,47 @@ export default async function AdminLogsPage({ searchParams }: Props) {
         </section>
       </div>
     </AdminLayout>
+  );
+}
+
+function actorClass(actor: string) {
+  switch (actor) {
+    case 'ADMIN':
+      return 'bg-brand-100 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300';
+    case 'CLIENTE':
+      return 'bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300';
+    case 'SYSTEM':
+      return 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300';
+    default:
+      return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200';
+  }
+}
+
+function entityClass(entity: string) {
+  switch (entity) {
+    case 'ORDEN':
+      return 'bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300';
+    case 'RIFA':
+      return 'bg-brand-100 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300';
+    case 'ADMIN':
+      return 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300';
+    default:
+      return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200';
+  }
+}
+
+function TableHead({ children }: { children: ReactNode }) {
+  return <th className="px-3 py-3 text-sm font-bold text-slate-500">{children}</th>;
+}
+
+function TableCell({ children }: { children: ReactNode }) {
+  return <td className="px-3 py-3 align-top text-sm text-slate-600 dark:text-slate-300">{children}</td>;
+}
+
+function EmptyState() {
+  return (
+    <div className="rounded-lg border border-dashed border-slate-200 py-8 text-center text-sm text-slate-500 dark:border-slate-800">
+      No hay registros con esos filtros.
+    </div>
   );
 }
