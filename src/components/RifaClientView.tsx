@@ -23,7 +23,14 @@ export function RifaClientView({ rifaId, precioBoleto, boletos }: RifaClientView
     setSeleccionados(nuevos);
   }, []);
 
-  const handleApartar = async (cliente: ClienteFormData) => {
+  const [pendingCliente, setPendingCliente] = useState<ClienteFormData | null>(null);
+
+  const handleApartar = (cliente: ClienteFormData) => {
+    setPendingCliente(cliente);
+  };
+
+  const handleConfirmApartar = async () => {
+    if (!pendingCliente) return;
     try {
       setIsSubmitting(true);
       setError('');
@@ -36,7 +43,7 @@ export function RifaClientView({ rifaId, precioBoleto, boletos }: RifaClientView
         body: JSON.stringify({
           rifaId,
           boletos: seleccionados.map((boleto) => boleto.numero),
-          cliente,
+          cliente: pendingCliente,
         }),
       });
 
@@ -51,6 +58,7 @@ export function RifaClientView({ rifaId, precioBoleto, boletos }: RifaClientView
           ordenUrl: result.ordenUrl || `/mis-boletos/${result.ordenId}`,
           whatsappUrl: result.url || '',
         });
+        setPendingCliente(null);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ocurrió un error al apartar los boletos');
@@ -91,7 +99,7 @@ export function RifaClientView({ rifaId, precioBoleto, boletos }: RifaClientView
       </div>
 
       {success && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-900/70 px-4 py-8 backdrop-blur-sm">
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-brand-900/70 px-4 py-8 backdrop-blur-sm">
           <div className="w-full max-w-3xl rounded-3xl bg-white p-8 text-center shadow-2xl dark:bg-[#0b2419] sm:p-10">
             <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-white">
               <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -133,6 +141,63 @@ export function RifaClientView({ rifaId, precioBoleto, boletos }: RifaClientView
           </div>
         </div>
       )}
+
+      {pendingCliente && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-brand-900/70 px-4 py-8 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl dark:bg-[#0b2419]">
+            <h3 className="mb-4 border-b border-slate-100 pb-2 text-2xl font-bold text-slate-900 dark:border-slate-700 dark:text-gold-100">
+              Confirma tus datos
+            </h3>
+            <p className="mb-4 text-sm text-slate-600 dark:text-slate-300">
+              Verifica que todo sea correcto antes de apartar los boletos.
+            </p>
+
+            <div className="mb-6 space-y-3 rounded-xl bg-slate-50 p-4 text-sm dark:bg-slate-800/50">
+              <ConfirmRow label="Boletos" value={seleccionados.map((boleto) => boleto.numeroFormateado).join(', ')} strong />
+              <ConfirmRow label="Nombre" value={pendingCliente.nombre} />
+              <ConfirmRow label="Teléfono" value={pendingCliente.telefono} />
+              <ConfirmRow label="Ubicación" value={`${pendingCliente.ciudad}, ${pendingCliente.estado}`} />
+              {pendingCliente.correo && <ConfirmRow label="Correo" value={pendingCliente.correo} />}
+              <div className="flex justify-between border-t border-slate-200 pt-2 dark:border-slate-700">
+                <span className="text-slate-500">Total a pagar:</span>
+                <span className="text-base font-bold text-brand-600 dark:text-brand-400">
+                  ${(seleccionados.length * precioBoleto).toFixed(2)}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setPendingCliente(null)}
+                className="flex-1 rounded-xl border border-slate-300 py-3 font-semibold text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-white/5"
+                disabled={isSubmitting}
+              >
+                Corregir datos
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmApartar}
+                className="flex-1 rounded-xl bg-brand-600 py-3 font-bold text-white shadow-lg shadow-brand-500/30 transition-colors hover:bg-brand-500 disabled:opacity-60"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Procesando...' : 'Sí, apartar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ConfirmRow({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+  return (
+    <div className="flex justify-between gap-4">
+      <span className="shrink-0 text-slate-500">{label}:</span>
+      <span className={`text-right ${strong ? 'font-bold text-brand-700 dark:text-gold-300' : 'font-semibold text-slate-800 dark:text-slate-200'}`}>
+        {value}
+      </span>
     </div>
   );
 }

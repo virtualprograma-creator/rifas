@@ -6,7 +6,7 @@ import { BoletoType } from './BoletoGrid';
 interface ClienteFormProps {
   boletosSeleccionados: BoletoType[];
   precioBoleto: number;
-  onSubmit: (datos: ClienteFormData) => Promise<void>;
+  onSubmit: (datos: ClienteFormData) => Promise<void> | void;
   isLoading: boolean;
 }
 
@@ -26,7 +26,6 @@ export function ClienteForm({ boletosSeleccionados, precioBoleto, onSubmit, isLo
     estado: '',
     correo: '',
   });
-  const [isConfirming, setIsConfirming] = useState(false);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -36,12 +35,7 @@ export function ClienteForm({ boletosSeleccionados, precioBoleto, onSubmit, isLo
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (boletosSeleccionados.length === 0) return;
-    setIsConfirming(true);
-  };
-
-  const handleConfirm = async () => {
-    await onSubmit(formData);
-    setIsConfirming(false);
+    onSubmit(formData);
   };
 
   const total = boletosSeleccionados.length * precioBoleto;
@@ -135,49 +129,6 @@ export function ClienteForm({ boletosSeleccionados, precioBoleto, onSubmit, isLo
         </button>
       </form>
 
-      {isConfirming && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-brand-900/70 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl dark:bg-[#0b2419]">
-            <h3 className="mb-4 border-b border-slate-100 pb-2 text-2xl font-bold text-slate-900 dark:border-slate-700 dark:text-gold-100">
-              Confirma tus datos
-            </h3>
-            <p className="mb-4 text-sm text-slate-600 dark:text-slate-300">
-              Verifica que todo sea correcto antes de apartar los boletos.
-            </p>
-
-            <div className="mb-6 space-y-3 rounded-xl bg-slate-50 p-4 text-sm dark:bg-slate-800/50">
-              <ConfirmRow label="Boletos" value={boletosSeleccionados.map((boleto) => boleto.numeroFormateado).join(', ')} strong />
-              <ConfirmRow label="Nombre" value={formData.nombre} />
-              <ConfirmRow label="Teléfono" value={formData.telefono} />
-              <ConfirmRow label="Ubicación" value={`${formData.ciudad}, ${formData.estado}`} />
-              {formData.correo && <ConfirmRow label="Correo" value={formData.correo} />}
-              <div className="flex justify-between border-t border-slate-200 pt-2 dark:border-slate-700">
-                <span className="text-slate-500">Total a pagar:</span>
-                <span className="text-base font-bold text-brand-600 dark:text-brand-400">${total.toFixed(2)}</span>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setIsConfirming(false)}
-                className="flex-1 rounded-xl border border-slate-300 py-3 font-semibold text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-white/5"
-                disabled={isLoading}
-              >
-                Corregir datos
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirm}
-                className="flex-1 rounded-xl bg-brand-600 py-3 font-bold text-white shadow-lg shadow-brand-500/30 transition-colors hover:bg-brand-500 disabled:opacity-60"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Procesando...' : 'Sí, apartar'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -216,17 +167,6 @@ function Field({
         className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-900 outline-none transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
         placeholder={placeholder}
       />
-    </div>
-  );
-}
-
-function ConfirmRow({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
-  return (
-    <div className="flex justify-between gap-4">
-      <span className="shrink-0 text-slate-500">{label}:</span>
-      <span className={`text-right ${strong ? 'font-bold text-brand-700 dark:text-gold-300' : 'font-semibold text-slate-800 dark:text-slate-200'}`}>
-        {value}
-      </span>
     </div>
   );
 }
