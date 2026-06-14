@@ -1,10 +1,23 @@
-function getWhatsAppNumber() {
+import { prisma } from './prisma';
+
+export async function getWhatsAppNumber() {
+  try {
+    const setting = await prisma.setting.findUnique({
+      where: { key: 'whatsapp_number' }
+    });
+    if (setting?.value) {
+      const digits = setting.value.replace(/\D/g, '');
+      return digits.length === 10 ? `52${digits}` : digits;
+    }
+  } catch (error) {
+    console.error('Error fetching whatsapp setting from database:', error);
+  }
   const configuredNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || process.env.WHATSAPP_NUMBER || '7441351057';
   const digits = configuredNumber.replace(/\D/g, '');
   return digits.length === 10 ? `52${digits}` : digits;
 }
 
-export function generateWhatsAppMessage(data: {
+export async function generateWhatsAppMessage(data: {
   nombre: string;
   telefono: string;
   ciudad: string;
@@ -34,10 +47,11 @@ ${data.ordenUrl ? `\n*Ver boletos:* ${data.ordenUrl}` : ''}
 
 Por favor, indiquenme los metodos de pago. Gracias!`;
 
-  return `https://wa.me/${getWhatsAppNumber()}?text=${encodeURIComponent(mensaje)}`;
+  const number = await getWhatsAppNumber();
+  return `https://wa.me/${number}?text=${encodeURIComponent(mensaje)}`;
 }
 
-export function generateAdminComprobanteMessage(data: {
+export async function generateAdminComprobanteMessage(data: {
   folio: string;
   cliente: string;
   rifaTitulo: string;
@@ -54,5 +68,6 @@ export function generateAdminComprobanteMessage(data: {
 *Total:* $${data.total}
 *Orden:* ${data.ordenUrl}`;
 
-  return `https://wa.me/${getWhatsAppNumber()}?text=${encodeURIComponent(mensaje)}`;
+  const number = await getWhatsAppNumber();
+  return `https://wa.me/${number}?text=${encodeURIComponent(mensaje)}`;
 }

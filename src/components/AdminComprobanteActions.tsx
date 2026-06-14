@@ -31,12 +31,12 @@ export function AdminComprobanteActions({ ordenId }: { ordenId: string }) {
   return (
     <div className="space-y-2">
       {error && <div className="rounded-lg bg-red-50 p-2 text-xs font-semibold text-red-600">{error}</div>}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button
           type="button"
           onClick={() => update('PAGADA')}
           disabled={Boolean(loading)}
-          className="rounded-lg bg-green-600 px-3 py-2 text-sm font-bold text-white hover:bg-green-500 disabled:opacity-60"
+          className="rounded-lg bg-green-600 px-3 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-green-500 active:scale-[0.98] disabled:opacity-60"
         >
           {loading === 'PAGADA' ? 'Aprobando...' : 'Aprobar'}
         </button>
@@ -44,7 +44,7 @@ export function AdminComprobanteActions({ ordenId }: { ordenId: string }) {
           type="button"
           onClick={() => update('RECHAZADA')}
           disabled={Boolean(loading)}
-          className="rounded-lg bg-red-600 px-3 py-2 text-sm font-bold text-white hover:bg-red-500 disabled:opacity-60"
+          className="rounded-lg bg-red-600 px-3 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-500 active:scale-[0.98] disabled:opacity-60"
         >
           {loading === 'RECHAZADA' ? 'Rechazando...' : 'Rechazar'}
         </button>

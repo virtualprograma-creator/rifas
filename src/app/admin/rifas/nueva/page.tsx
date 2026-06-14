@@ -26,12 +26,18 @@ export default function NuevaRifa() {
     imagenUrl: '',
     precioBoleto: '',
     cantidadBoletos: '5000',
+    ocultarEstadisticasPublicas: false,
     fechaSorteo: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: checked }));
   };
 
   const addMetodoPago = () => {
@@ -107,6 +113,22 @@ export default function NuevaRifa() {
 
             <Input label="Fecha del Sorteo *" required type="datetime-local" name="fechaSorteo" value={formData.fechaSorteo} onChange={handleChange} className="md:col-span-2" />
             <Input label="Descripcion Corta" name="descripcionCorta" value={formData.descripcionCorta} onChange={handleChange} maxLength={150} className="md:col-span-2" />
+
+            <label className="md:col-span-2 flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/50">
+              <input
+                type="checkbox"
+                name="ocultarEstadisticasPublicas"
+                checked={formData.ocultarEstadisticasPublicas}
+                onChange={handleCheckboxChange}
+                className="mt-1 h-5 w-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+              />
+              <span>
+                <span className="block font-bold text-slate-800 dark:text-slate-100">Ocultar vendidos y disponibles</span>
+                <span className="mt-1 block text-sm text-slate-500">
+                  En la página pública solo se mostrará precio y cantidad total de boletos.
+                </span>
+              </span>
+            </label>
 
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Descripcion Completa</label>

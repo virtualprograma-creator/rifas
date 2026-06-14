@@ -12,6 +12,7 @@ interface RifaEditFormProps {
     descripcionCompleta: string;
     imagenUrl: string;
     precioBoleto: number;
+    ocultarEstadisticasPublicas: boolean;
     fechaSorteo: Date;
     estado: string;
     razonEstado: string | null;
@@ -42,6 +43,7 @@ export function RifaEditForm({ rifa }: RifaEditFormProps) {
     descripcionCompleta: rifa.descripcionCompleta,
     imagenUrl: rifa.imagenUrl,
     precioBoleto: rifa.precioBoleto.toString(),
+    ocultarEstadisticasPublicas: rifa.ocultarEstadisticasPublicas,
     fechaSorteo: toDateTimeLocal(new Date(rifa.fechaSorteo)),
     estado: rifa.estado,
     razonEstado: rifa.razonEstado || '',
@@ -64,6 +66,11 @@ export function RifaEditForm({ rifa }: RifaEditFormProps) {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: checked }));
   };
 
   const addMetodoPago = () => {
@@ -192,6 +199,22 @@ export function RifaEditForm({ rifa }: RifaEditFormProps) {
         </div>
         <Input label="URL de imagen" name="imagenUrl" type="url" value={formData.imagenUrl} onChange={handleChange} />
       </div>
+
+      <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/50">
+        <input
+          type="checkbox"
+          name="ocultarEstadisticasPublicas"
+          checked={formData.ocultarEstadisticasPublicas}
+          onChange={handleCheckboxChange}
+          className="mt-1 h-5 w-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+        />
+        <span>
+          <span className="block font-bold text-slate-800 dark:text-slate-100">Ocultar vendidos y disponibles</span>
+          <span className="mt-1 block text-sm text-slate-500">
+            En la página pública solo se mostrará precio y cantidad total de boletos.
+          </span>
+        </span>
+      </label>
 
       {formData.estado !== 'ACTIVA' && (
         <Input

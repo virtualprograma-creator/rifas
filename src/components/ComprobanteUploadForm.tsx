@@ -56,15 +56,16 @@ export function ComprobanteUploadForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl bg-[#079b89] p-5 text-white shadow-sm">
-      <div className="mb-4 flex items-center justify-center gap-2 text-lg font-extrabold uppercase">
-        <span aria-hidden="true">[+]</span>
-        Enviar comprobante
+    <form onSubmit={handleSubmit} className="rounded-2xl bg-[#079b89] p-5 text-white shadow-lg shadow-teal-900/10">
+      <div className="mb-4">
+        <p className="text-xs font-bold uppercase tracking-[0.22em] text-white/75">Paso 2</p>
+        <h2 className="mt-1 text-xl font-black">Enviar comprobante</h2>
       </div>
 
-      <label className="mx-auto flex min-h-32 max-w-44 cursor-pointer flex-col items-center justify-center rounded-xl bg-white px-4 py-5 text-center text-sm font-semibold text-slate-500 transition hover:bg-slate-50">
-        <span className="mb-2 text-3xl text-slate-400">Upload</span>
-        <span>{file ? file.name : 'Subir archivo'}</span>
+      <label className="flex min-h-36 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/50 bg-white/10 px-4 py-5 text-center text-sm font-semibold text-white transition hover:bg-white/15">
+        <UploadIcon />
+        <span className="mt-3 max-w-full truncate">{file ? file.name : 'Seleccionar imagen o PDF'}</span>
+        <span className="mt-1 text-xs font-medium text-white/75">Captura, foto o documento PDF</span>
         <input
           type="file"
           accept="image/*,.pdf"
@@ -73,8 +74,8 @@ export function ComprobanteUploadForm({
         />
       </label>
 
-      <p className="mt-4 text-center text-sm text-white/90">
-        Envia una imagen, captura o PDF de tu comprobante para validar tu participacion.
+      <p className="mt-4 text-sm text-white/90">
+        Envía una imagen, captura o PDF de tu comprobante para validar tu participación.
       </p>
 
       {comprobanteUrl && (
@@ -82,14 +83,14 @@ export function ComprobanteUploadForm({
           href={comprobanteUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-3 block text-center text-sm font-bold underline"
+          className="mt-3 block rounded-xl bg-white/10 px-3 py-2 text-center text-sm font-bold underline-offset-4 hover:bg-white/15 hover:underline"
         >
           Ver comprobante enviado
         </a>
       )}
 
-      {error && <div className="mt-4 rounded-xl bg-red-950/30 px-3 py-2 text-sm">{error}</div>}
-      {success && <div className="mt-4 rounded-xl bg-white/15 px-3 py-2 text-sm">{success}</div>}
+      {error && <div className="mt-4 rounded-xl bg-red-950/30 px-3 py-2 text-sm font-semibold">{error}</div>}
+      {success && <div className="mt-4 rounded-xl bg-white/15 px-3 py-2 text-sm font-semibold">{success}</div>}
       {adminWhatsappUrl && (
         <a
           href={adminWhatsappUrl}
@@ -109,5 +110,13 @@ export function ComprobanteUploadForm({
         {isUploading ? 'Subiendo...' : 'Enviar comprobante'}
       </button>
     </form>
+  );
+}
+
+function UploadIcon() {
+  return (
+    <svg className="h-9 w-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 16V4m0 0L7 9m5-5l5 5M5 20h14" />
+    </svg>
   );
 }

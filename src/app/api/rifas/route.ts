@@ -11,6 +11,7 @@ type CrearRifaRequestBody = {
   imagenUrl?: string;
   precioBoleto?: string | number;
   cantidadBoletos?: string | number;
+  ocultarEstadisticasPublicas?: boolean;
   fechaSorteo?: string;
   metodosPago?: {
     banco?: string;
@@ -31,7 +32,7 @@ export async function POST(req: Request) {
     const data = (await req.json()) as CrearRifaRequestBody;
     
     // Validar datos básicos
-    const { titulo, categoria, descripcionCorta, descripcionCompleta, imagenUrl, precioBoleto, cantidadBoletos, fechaSorteo } = data;
+    const { titulo, categoria, descripcionCorta, descripcionCompleta, imagenUrl, precioBoleto, cantidadBoletos, ocultarEstadisticasPublicas, fechaSorteo } = data;
     
     if (!titulo || !precioBoleto || !cantidadBoletos || !fechaSorteo) {
       return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 });
@@ -77,6 +78,7 @@ export async function POST(req: Request) {
         imagenUrl: imagenUrl || '',
         precioBoleto: precioBoletoNumber,
         cantidadBoletos: cantidadBoletosNumber,
+        ocultarEstadisticasPublicas: Boolean(ocultarEstadisticasPublicas),
         fechaSorteo: new Date(fechaSorteo),
         estado: 'ACTIVA',
         metodosPago: {

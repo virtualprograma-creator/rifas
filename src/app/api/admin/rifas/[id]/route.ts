@@ -15,6 +15,7 @@ type UpdateRifaBody = {
   imagenUrl?: string;
   precioBoleto?: string | number;
   fechaSorteo?: string;
+  ocultarEstadisticasPublicas?: boolean;
   estado?: string;
   razonEstado?: string;
   metodosPago?: {
@@ -72,6 +73,7 @@ export async function PATCH(req: Request, { params }: Props) {
           descripcionCompleta: body.descripcionCompleta?.trim() || '',
           imagenUrl: body.imagenUrl?.trim() || '',
           precioBoleto,
+          ocultarEstadisticasPublicas: Boolean(body.ocultarEstadisticasPublicas),
           fechaSorteo: new Date(body.fechaSorteo!),
           estado,
           razonEstado: estado === 'ACTIVA' ? null : body.razonEstado?.trim() || null,
@@ -94,6 +96,7 @@ export async function PATCH(req: Request, { params }: Props) {
       metadata: {
         estado,
         precioBoleto,
+        ocultarEstadisticasPublicas: Boolean(body.ocultarEstadisticasPublicas),
         metodosPago: metodosPago.length,
       },
     });

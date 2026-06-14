@@ -19,6 +19,8 @@ const actionLabels: Record<string, string> = {
   CREATE_ADMIN: 'Creo admin',
   CREATE_RIFA: 'Creo rifa',
   UPDATE_RIFA: 'Edito rifa',
+  DELETE_RIFA: 'Elimino rifa',
+  UPDATE_STATUS: 'Cambio estado',
   SELECT_WINNER: 'Selecciono ganador',
   UPDATE_ORDER: 'Cambio orden',
   REMOVE_ORDER_TICKETS: 'Quito boletos',
@@ -26,6 +28,7 @@ const actionLabels: Record<string, string> = {
   CREATE_ORDER: 'Apartado cliente',
   SELECT_PAYMENT_METHOD: 'Selecciono banco',
   UPLOAD_RECEIPT: 'Subio comprobante',
+  UPDATE_SETTING: 'Actualizo config',
 };
 
 export default async function AdminLogsPage({ searchParams }: Props) {
@@ -83,6 +86,7 @@ export default async function AdminLogsPage({ searchParams }: Props) {
             />
             <select
               name="actor"
+              title="Filtrar por actor"
               defaultValue={actorFilter}
               className="min-h-11 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-700 dark:bg-slate-950/50 dark:text-white"
             >
@@ -93,6 +97,7 @@ export default async function AdminLogsPage({ searchParams }: Props) {
             </select>
             <select
               name="action"
+              title="Filtrar por tipo de acción"
               defaultValue={actionFilter}
               className="min-h-11 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-700 dark:bg-slate-950/50 dark:text-white"
             >
@@ -105,6 +110,7 @@ export default async function AdminLogsPage({ searchParams }: Props) {
             </select>
             <select
               name="entity"
+              title="Filtrar por tipo de entidad"
               defaultValue={entityFilter}
               className="min-h-11 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-brand-500 dark:border-slate-700 dark:bg-slate-950/50 dark:text-white"
             >
@@ -127,38 +133,33 @@ export default async function AdminLogsPage({ searchParams }: Props) {
             </span>
           </div>
 
-          <div className="space-y-3 lg:hidden">
+          <div className="space-y-2 lg:hidden">
             {logs.map((log) => (
               <article
                 key={log.id}
-                className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950/35"
+                className="rounded-xl border border-slate-150 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/10 p-2.5 hover:border-slate-200 dark:hover:border-slate-700 transition-colors shadow-2xs"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <h4 className="truncate text-sm font-bold text-slate-950 dark:text-white">
-                      {log.adminNombre || log.actorType}
-                    </h4>
-                    {log.adminEmail && <p className="mt-1 truncate text-xs text-slate-500">{log.adminEmail}</p>}
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className={`inline-block rounded-full px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide ${actorClass(log.actorType)}`}>
+                      {log.actorType}
+                    </span>
+                    <span className="truncate text-xs font-bold text-slate-800 dark:text-slate-200">
+                      {log.adminNombre || 'Cliente'}
+                    </span>
                   </div>
-                  <span className={`shrink-0 rounded-full px-2 py-1 text-[11px] font-bold ${actorClass(log.actorType)}`}>
-                    {log.actorType}
+                  <span className="shrink-0 text-[10px] font-medium text-slate-400 dark:text-slate-500">
+                    {new Date(log.createdAt).toLocaleDateString('es-MX', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
 
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="rounded-full bg-slate-200 px-2 py-1 text-[11px] font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                <div className="mt-1.5 flex items-start gap-2">
+                  <span className="shrink-0 rounded bg-slate-200/60 dark:bg-slate-800 px-1.5 py-0.5 text-[9px] font-bold text-slate-700 dark:text-slate-300">
                     {actionLabels[log.action] || log.action}
                   </span>
-                  <span className="rounded-full bg-slate-200 px-2 py-1 text-[11px] font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                    {log.entityType}
-                  </span>
-                </div>
-
-                <p className="mt-3 text-sm leading-5 text-slate-700 dark:text-slate-200">{log.summary}</p>
-
-                <div className="mt-3 grid gap-2 text-xs text-slate-500">
-                  <div>{new Date(log.createdAt).toLocaleString('es-MX')}</div>
-                  {log.entityId && <div className="break-all">ID: {log.entityId}</div>}
+                  <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300 font-medium flex-1 wrap-break-word">
+                    {log.summary}
+                  </p>
                 </div>
               </article>
             ))}

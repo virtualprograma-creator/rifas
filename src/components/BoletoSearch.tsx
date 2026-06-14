@@ -43,7 +43,7 @@ export function BoletoSearch() {
 
     const query = numero.trim();
     if (!query) {
-      setError('Ingresa un numero de boleto');
+      setError('Ingresa un número de boleto');
       setBoletos([]);
       setHasSearched(false);
       return;
@@ -76,11 +76,11 @@ export function BoletoSearch() {
       <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-gold-600 dark:text-gold-300">
-            Consulta rapida
+            Consulta rápida
           </p>
           <h2 className="mt-2 text-2xl font-bold text-brand-900 dark:text-gold-100">Buscar boleto</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
-            Escribe el folio o el numero del boleto para ver la informacion de tu participacion.
+            Escribe el folio o el número del boleto para ver la información de tu participación.
           </p>
         </div>
 
@@ -93,7 +93,7 @@ export function BoletoSearch() {
               onChange={(event) => setNumero(event.target.value)}
               className="min-h-12 rounded-xl border border-slate-300 bg-slate-50 px-4 text-base text-slate-900 outline-none focus:ring-2 focus:ring-gold-300 dark:border-gold-500/30 dark:bg-[#071710] dark:text-white"
               placeholder="Ej. 0057 o 30F9GYLFDQ"
-              aria-label="Folio o numero de boleto"
+              aria-label="Folio o número de boleto"
             />
             <button
               type="submit"
@@ -114,7 +114,7 @@ export function BoletoSearch() {
             <div className="mt-4 space-y-3">
               {boletos.length === 0 ? (
                 <div className="rounded-xl border border-slate-200 px-4 py-4 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
-                  No encontramos informacion con ese folio o numero de boleto.
+                  No encontramos información con ese folio o número de boleto.
                 </div>
               ) : (
                 boletos.map((boleto) => (
@@ -140,7 +140,7 @@ export function BoletoSearch() {
                           Folio: {boleto.folio}
                           {boleto.ordenUrl && (
                             <Link href={boleto.ordenUrl} className="ml-3 text-brand-700 hover:text-brand-600 dark:text-gold-300">
-                              Ver informacion
+                              Ver información
                             </Link>
                           )}
                         </p>

@@ -45,21 +45,8 @@ export default async function MisBoletosPage({ params }: Props) {
 
   const boletos = orden.boletos.map((boleto) => boleto.numeroFormateado);
   const folio = displayFolio(orden);
-  const estadoPago =
-    orden.estado === 'PAGADA'
-      ? 'Pagado'
-      : orden.estado === 'EN_REVISION'
-        ? 'Pendiente de validacion'
-        : 'Pendiente';
-  const estadoBoleto =
-    orden.estado === 'PENDIENTE'
-      ? 'Apartado'
-      : orden.estado === 'EN_REVISION'
-        ? 'En revision'
-        : orden.estado === 'PAGADA'
-          ? 'Pagada'
-          : orden.estado;
-  const whatsappUrl = generateWhatsAppMessage({
+  const estado = getOrderStatus(orden.estado);
+  const whatsappUrl = await generateWhatsAppMessage({
     nombre: orden.cliente.nombre,
     telefono: orden.cliente.telefono,
     ciudad: orden.cliente.ciudad,
@@ -72,61 +59,74 @@ export default async function MisBoletosPage({ params }: Props) {
   });
 
   return (
-    <main className="min-h-screen bg-[#eef8f2] px-4 py-10 dark:bg-[#071710]">
-      <div className="mx-auto max-w-xl">
-        <div className="rounded-3xl bg-white p-6 text-center shadow-xl dark:bg-[#0b2419]">
-          <div className="border-y-2 border-dashed border-teal-400/60 py-6">
-            <h1 className="text-xl font-extrabold uppercase text-slate-900 dark:text-gold-100">
-              {orden.cliente.nombre}
-            </h1>
-            <p className="mt-2 text-lg font-bold text-slate-800 dark:text-white">{boletos.join(', ')}</p>
-            <span className="mt-3 inline-flex rounded-md bg-blue-600 px-5 py-2 text-sm font-extrabold uppercase text-white">
-              {estadoBoleto}
-            </span>
-            <p className="mt-4 text-xs font-semibold uppercase tracking-widest text-slate-400">
-              Folio: {folio}
-            </p>
-          </div>
+    <main className="min-h-screen bg-[#eef8f2] px-4 py-8 dark:bg-[#071710] sm:py-10">
+      <div className="mx-auto max-w-6xl">
+        <section className="premium-card rounded-3xl bg-white p-5 shadow-xl dark:bg-[#0b2419] sm:p-7">
+          <div className="relative z-10 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+            <div>
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.24em] text-brand-600 dark:text-gold-300">Tus boletos</p>
+                  <h1 className="mt-1 text-2xl font-black text-slate-950 dark:text-white sm:text-4xl">
+                    {orden.cliente.nombre}
+                  </h1>
+                </div>
+                <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-wider ${estado.className}`}>
+                  {estado.label}
+                </span>
+              </div>
 
-          <div className="mt-5 grid gap-3 text-left text-sm">
-            <Info label="Rifa" value={orden.rifa.titulo} />
-            <Info label="Total" value={currencyFormatter.format(orden.total)} />
-            <Info label="Estado de pago" value={estadoPago} />
-            <Info
-              label="Vence"
-              value={orden.expiresAt ? new Date(orden.expiresAt).toLocaleString('es-MX') : 'Sin vencimiento'}
-            />
-            <div className="rounded-xl bg-slate-50 p-4 dark:bg-slate-900/50">
-              <div className="text-xs font-bold uppercase text-slate-500">Tiempo restante</div>
-              <div className="mt-1 font-semibold text-slate-900 dark:text-slate-100">
-                <OrderCountdown expiresAt={orden.expiresAt?.toISOString() || null} />
+              <div className="rounded-2xl border-2 border-dashed border-gold-400/60 bg-gold-50/40 p-5 text-center dark:bg-gold-900/10">
+                <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">Números apartados</p>
+                <p className="mt-3 text-2xl font-black leading-relaxed text-brand-900 dark:text-gold-100">
+                  {boletos.join(', ')}
+                </p>
+                <p className="mt-4 text-xs font-semibold uppercase tracking-widest text-slate-400">Folio: {folio}</p>
+              </div>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <Info label="Rifa" value={orden.rifa.titulo} />
+                <Info label="Total" value={currencyFormatter.format(orden.total)} strong />
+                <Info label="Estado de pago" value={estado.paymentLabel} />
+                <Info
+                  label="Vence"
+                  value={orden.expiresAt ? new Date(orden.expiresAt).toLocaleString('es-MX') : 'Sin vencimiento'}
+                />
+              </div>
+
+              <div className="mt-3 rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
+                <div className="text-xs font-bold uppercase tracking-wide text-slate-500">Tiempo restante</div>
+                <div className="mt-1 text-lg font-black text-slate-900 dark:text-slate-100">
+                  <OrderCountdown expiresAt={orden.expiresAt?.toISOString() || null} />
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex min-h-12 items-center justify-center rounded-xl bg-[#079b89] px-5 font-extrabold uppercase text-white shadow-lg shadow-teal-900/10 transition hover:bg-[#087f72] active:scale-[0.98]"
+                >
+                  Enviar a WhatsApp
+                </a>
+
+                <TicketDownloader
+                  orden={{
+                    ...orden,
+                    folio,
+                    boletos: orden.boletos.map((boleto) => ({ numeroFormateado: boleto.numeroFormateado })),
+                  }}
+                />
               </div>
             </div>
+
+            <div className="space-y-5">
+              <PaymentMethods ordenId={orden.id} selectedMetodoPagoId={orden.metodoPagoId} metodos={orden.rifa.metodosPago} />
+              <ComprobanteUploadForm ordenId={orden.id} comprobanteUrl={orden.comprobanteUrl} />
+            </div>
           </div>
-
-          <div className="mt-5">
-            <PaymentMethods ordenId={orden.id} selectedMetodoPagoId={orden.metodoPagoId} metodos={orden.rifa.metodosPago} />
-          </div>
-
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-5 flex min-h-12 items-center justify-center rounded-lg bg-[#079b89] px-5 font-extrabold uppercase text-white transition hover:bg-[#087f72]"
-          >
-            Enviar a WhatsApp
-          </a>
-
-          <TicketDownloader orden={{
-            ...orden,
-            folio: folio,
-            boletos: orden.boletos.map(b => ({ numeroFormateado: b.numeroFormateado }))
-          }} />
-
-          <div className="mt-4">
-            <ComprobanteUploadForm ordenId={orden.id} comprobanteUrl={orden.comprobanteUrl} />
-          </div>
-        </div>
+        </section>
 
         <div className="mt-6 text-center">
           <Link href="/" className="font-semibold text-brand-700 hover:text-brand-600 dark:text-gold-100">
@@ -138,11 +138,48 @@ export default async function MisBoletosPage({ params }: Props) {
   );
 }
 
-function Info({ label, value }: { label: string; value: string }) {
+function getOrderStatus(status: string) {
+  switch (status) {
+    case 'PAGADA':
+      return {
+        label: 'Pagada',
+        paymentLabel: 'Pago confirmado',
+        className: 'bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-300',
+      };
+    case 'EN_REVISION':
+      return {
+        label: 'En revisión',
+        paymentLabel: 'Pendiente de validación',
+        className: 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300',
+      };
+    case 'VENCIDA':
+      return {
+        label: 'Vencida',
+        paymentLabel: 'Tiempo agotado',
+        className: 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300',
+      };
+    case 'CANCELADA':
+      return {
+        label: 'Cancelada',
+        paymentLabel: 'Cancelada',
+        className: 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300',
+      };
+    default:
+      return {
+        label: 'Apartada',
+        paymentLabel: 'Pendiente de pago',
+        className: 'bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300',
+      };
+  }
+}
+
+function Info({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
   return (
-    <div className="rounded-xl bg-slate-50 p-4 dark:bg-slate-900/50">
-      <div className="text-xs font-bold uppercase text-slate-500">{label}</div>
-      <div className="mt-1 font-semibold text-slate-900 dark:text-slate-100">{value}</div>
+    <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
+      <div className="text-xs font-bold uppercase tracking-wide text-slate-500">{label}</div>
+      <div className={`mt-1 text-slate-900 dark:text-slate-100 ${strong ? 'text-xl font-black text-brand-700 dark:text-gold-300' : 'font-semibold'}`}>
+        {value}
+      </div>
     </div>
   );
 }

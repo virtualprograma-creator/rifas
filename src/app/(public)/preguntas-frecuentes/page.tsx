@@ -1,4 +1,6 @@
 import React from 'react';
+import { getWhatsAppNumber } from '@/lib/whatsapp';
+
 
 const faqs = [
   {
@@ -27,7 +29,8 @@ const faqs = [
   }
 ];
 
-export default function FAQPage() {
+export default async function FAQPage() {
+  const whatsappNumber = await getWhatsAppNumber();
   return (
     <main className="min-h-screen bg-[#f4f7f1] dark:bg-[#071710] pb-20">
       <div className="bg-[#052d20] text-white py-16 px-4 relative overflow-hidden border-b border-gold-500/30">
@@ -66,7 +69,7 @@ export default function FAQPage() {
           <h2 className="text-xl font-bold text-brand-900 dark:text-gold-100 mb-2">¿Aún tienes dudas?</h2>
           <p className="text-slate-600 dark:text-slate-400 mb-6">Estamos aquí para ayudarte en todo momento.</p>
           <a 
-            href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '521'}`}
+            href={`https://wa.me/${whatsappNumber}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#25D366] text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition-transform shadow-lg shadow-green-500/20"

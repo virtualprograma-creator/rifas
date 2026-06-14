@@ -32,25 +32,25 @@ export function RifaQuickActions({ rifaId, estadoActual }: RifaQuickActionsProps
 
       router.refresh();
     } catch {
-      alert('Error de conexion');
+      alert('Error de conexión');
     } finally {
       setLoading(false);
     }
   };
 
   const pauseRifa = () => {
-    const razon = window.prompt('Por que deseas pausar esta rifa? Aparecera en la pagina publica.');
+    const razon = window.prompt('¿Por qué deseas pausar esta rifa? Aparecerá en la página pública.');
     if (razon === null) return;
     updateStatus('PAUSADA', razon);
   };
 
   const restoreRifa = () => {
-    if (!window.confirm('Deseas restaurar esta rifa y volverla activa?')) return;
+    if (!window.confirm('¿Deseas restaurar esta rifa y volverla activa?')) return;
     updateStatus('ACTIVA');
   };
 
   const deleteRifa = () => {
-    const razon = window.prompt('Motivo para eliminar/ocultar esta rifa. Podras restaurarla despues.');
+    const razon = window.prompt('Motivo para eliminar/ocultar esta rifa. Podrás restaurarla después.');
     if (razon === null) return;
     updateStatus('CANCELADA', razon || 'Rifa eliminada temporalmente');
   };

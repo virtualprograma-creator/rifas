@@ -43,19 +43,20 @@ export default async function AdminClientesPage({ searchParams }: Props) {
           <p className="text-sm text-slate-500 mt-1">Personas que han apartado boletos en tus rifas.</p>
         </div>
 
-        <form className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 mb-6">
+        <form className="flex flex-col sm:flex-row gap-3 mb-6">
           <input
             name="q"
             defaultValue={query}
-            className="rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 px-4 py-2 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500"
-            placeholder="Buscar nombre, telefono, correo o ciudad"
+            className="flex-1 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 px-4 py-2.5 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500 text-sm"
+            placeholder="Buscar nombre, teléfono, correo o ciudad"
           />
-          <button className="rounded-xl bg-brand-600 px-5 py-2 font-semibold text-white hover:bg-brand-500">
+          <button className="rounded-xl bg-brand-600 px-6 py-2.5 font-bold text-white hover:bg-brand-500 transition-colors shadow-sm active:scale-[0.99] text-sm">
             Buscar
           </button>
         </form>
 
-        <div className="overflow-x-auto">
+        {/* Desktop View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-700">
@@ -105,6 +106,69 @@ export default async function AdminClientesPage({ searchParams }: Props) {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile View */}
+        <div className="grid grid-cols-1 gap-4 md:hidden">
+          {clientes.map((cliente) => {
+            const totalGastado = cliente.ordenes.reduce((sum, orden) => sum + orden.total, 0);
+
+            return (
+              <div
+                key={cliente.id}
+                className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 p-4 space-y-3 shadow-sm hover:border-slate-200 dark:hover:border-slate-700 transition-colors"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="font-bold text-slate-900 dark:text-white text-base">
+                      {cliente.nombre}
+                    </h3>
+                    <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+                      Registrado el {new Date(cliente.createdAt).toLocaleDateString('es-MX')}
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-brand-500/10 px-2.5 py-1 text-xs font-bold text-brand-600 dark:text-brand-400">
+                    {currencyFormatter.format(totalGastado)}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-xs border-t border-slate-100 dark:border-slate-800 pt-3">
+                  <div>
+                    <div className="font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide text-[10px]">Contacto</div>
+                    <div className="mt-1 text-slate-700 dark:text-slate-300 font-medium wrap-break-word">
+                      <div>{cliente.telefono}</div>
+                      {cliente.correo && (
+                        <div className="text-slate-500 text-[11px] font-normal mt-0.5">{cliente.correo}</div>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide text-[10px]">Ubicación</div>
+                    <div className="mt-1 text-slate-700 dark:text-slate-300 font-medium">
+                      {cliente.ciudad}, {cliente.estado}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide text-[10px]">Órdenes</div>
+                    <div className="mt-1 font-bold text-slate-800 dark:text-slate-200">
+                      {cliente.ordenes.length}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide text-[10px]">Boletos</div>
+                    <div className="mt-1 font-bold text-slate-800 dark:text-slate-200">
+                      {cliente.boletos.length}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          {clientes.length === 0 && (
+            <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 py-8 text-center text-sm text-slate-500">
+              Todavía no hay clientes registrados.
+            </div>
+          )}
         </div>
       </div>
     </AdminLayout>

@@ -57,7 +57,7 @@ export function AdminOrderActions({ ordenId, estado, comprobanteUrl, notasPago }
           className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 px-4 py-2 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="PENDIENTE">Pendiente</option>
-          <option value="EN_REVISION">Pendiente de validacion</option>
+          <option value="EN_REVISION">Pendiente de validación</option>
           <option value="PAGADA">Pagada</option>
           <option value="RECHAZADA">Rechazada</option>
           <option value="CANCELADA">Cancelada</option>

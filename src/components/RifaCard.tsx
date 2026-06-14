@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { formatSpanishDate } from '@/lib/dates';
 
 interface RifaProps {
@@ -16,97 +17,126 @@ interface RifaProps {
   razonEstado?: string | null;
 }
 
-export function RifaCard({ 
-  id, titulo, descripcionCorta, imagenUrl, precioBoleto, fechaSorteo, boletosDisponibles, boletosTotales, estado = 'ACTIVA', ganadorBoleto, ganadorCliente, razonEstado 
+export function RifaCard({
+  id,
+  titulo,
+  descripcionCorta,
+  imagenUrl,
+  precioBoleto,
+  fechaSorteo,
+  boletosDisponibles,
+  boletosTotales,
+  estado = 'ACTIVA',
+  ganadorBoleto,
+  ganadorCliente,
+  razonEstado,
 }: RifaProps) {
-  const porcentajeVendido = Math.round(((boletosTotales - boletosDisponibles) / boletosTotales) * 100);
+  const porcentajeVendido = boletosTotales > 0
+    ? Math.min(100, Math.round(((boletosTotales - boletosDisponibles) / boletosTotales) * 100))
+    : 0;
   const publicId = id.slice(-10).toUpperCase();
   const isFinalizada = estado === 'FINALIZADA';
   const isPausada = estado === 'PAUSADA';
   const isCancelada = estado === 'CANCELADA';
   const noActiva = isFinalizada || isPausada || isCancelada;
+  const disponibilidadLabel = porcentajeVendido >= 85 ? 'Últimos boletos' : 'Disponible';
 
   return (
-    <div className={`bg-white dark:bg-[#0b2419] rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col h-full border ${noActiva ? 'border-amber-500/50 opacity-90' : 'border-gold-500/20'}`}>
+    <div className={`premium-card gold-shine group flex h-full flex-col overflow-hidden rounded-2xl bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl dark:bg-[#0b2419] ${noActiva ? 'opacity-90' : ''}`}>
       <div className="relative aspect-[16/10] w-full overflow-hidden sm:aspect-[16/9]">
-        <img 
-          src={imagenUrl || '/placeholder.jpg'} 
-          alt={titulo} 
+        <Image
+          src={imagenUrl || '/placeholder.jpg'}
+          alt={titulo}
+          fill
+          sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+          unoptimized
           className={`h-full w-full object-cover transition-transform duration-500 ${noActiva ? 'grayscale-[30%]' : 'group-hover:scale-105'}`}
         />
+
         {isFinalizada && (
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-[1px] flex items-center justify-center p-4">
-            <span className="bg-amber-500 text-white font-black text-xs md:text-sm uppercase tracking-[0.2em] px-5 py-2.5 rounded-full shadow-2xl border border-white/30 transform transition-transform group-hover:scale-105">
-              RIFA FINALIZADA
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[1px]">
+            <span className="rounded-full border border-white/30 bg-amber-500 px-5 py-2.5 text-xs font-black uppercase tracking-[0.2em] text-white shadow-2xl transition-transform group-hover:scale-105 md:text-sm">
+              Rifa finalizada
             </span>
           </div>
         )}
+
         {isPausada && (
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-            <span className="bg-amber-600 text-white font-bold py-1 px-3 rounded-full text-sm uppercase tracking-wider">⏸️ Pausado</span>
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+            <span className="rounded-full bg-amber-600 px-3 py-1 text-sm font-bold uppercase tracking-wider text-white">
+              Pausado
+            </span>
           </div>
         )}
+
         {isCancelada && (
-          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-            <span className="bg-red-600 text-white font-bold py-1 px-3 rounded-full text-sm uppercase tracking-wider">🚫 Cancelado</span>
+          <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+            <span className="rounded-full bg-red-600 px-3 py-1 text-sm font-bold uppercase tracking-wider text-white">
+              Cancelado
+            </span>
           </div>
         )}
+
         {!noActiva && (
-          <div className="absolute top-3 right-3 bg-gold-400 text-brand-900 font-bold py-1 px-3 rounded-full shadow-md">
-            ${precioBoleto.toFixed(2)}
-          </div>
+          <>
+            <div className="absolute right-3 top-3 rounded-full border border-white/45 bg-gold-300 px-3 py-1 text-sm font-black text-brand-900 shadow-lg shadow-gold-900/20">
+              ${precioBoleto.toFixed(2)}
+            </div>
+            <div className="absolute left-3 top-3 rounded-full border border-white/35 bg-brand-900/85 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-gold-100 shadow-lg backdrop-blur-sm">
+              {disponibilidadLabel}
+            </div>
+          </>
         )}
       </div>
-      
-      <div className="p-5 flex-grow flex flex-col">
-        <h3 className="text-xl font-bold mb-2 text-brand-900 dark:text-gold-100">{titulo}</h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">{descripcionCorta}</p>
-        
+
+      <div className="relative z-10 flex flex-grow flex-col p-5">
+        <h3 className="mb-2 text-xl font-black text-brand-900 dark:text-gold-100">{titulo}</h3>
+        <p className="mb-4 line-clamp-2 text-sm text-slate-500 dark:text-slate-400">{descripcionCorta}</p>
+
         <div className="mt-auto space-y-4">
           {!noActiva ? (
             <div>
-              <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
+              <div className="mb-1 flex justify-between text-xs font-medium text-slate-600 dark:text-slate-300">
                 <span>{boletosDisponibles} boletos disponibles</span>
                 <span>{porcentajeVendido}% vendido</span>
               </div>
-              <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                <div 
-                  className="bg-gold-400 h-2 rounded-full" 
-                  style={{ width: `${porcentajeVendido}%` }}
-                ></div>
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200 ring-1 ring-black/5 dark:bg-slate-800 dark:ring-white/10">
+                <div className="progress-premium h-full rounded-full" style={{ width: `${porcentajeVendido}%` }} />
               </div>
             </div>
           ) : isFinalizada ? (
-            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg p-2 text-center flex flex-col justify-center min-h-[44px]">
-              <p className="text-[10px] uppercase tracking-widest text-amber-600 dark:text-amber-400 font-bold mb-0.5">Ganador: {ganadorCliente || 'Anónimo'}</p>
+            <div className="flex min-h-[44px] flex-col justify-center rounded-lg border border-amber-200 bg-amber-50 p-2 text-center dark:border-amber-700/50 dark:bg-amber-900/20">
+              <p className="mb-0.5 text-[10px] font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400">
+                Ganador: {ganadorCliente || 'Anónimo'}
+              </p>
               <p className="text-sm font-extrabold text-slate-800 dark:text-slate-100">Boleto #{ganadorBoleto}</p>
             </div>
           ) : (
-            <div className={`rounded-lg p-2 text-center flex flex-col justify-center min-h-[44px] border ${isPausada ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-900/30' : 'bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-900/30'}`}>
-               <p className={`text-[11px] font-bold leading-tight ${isPausada ? 'text-amber-700 dark:text-amber-400' : 'text-red-700 dark:text-red-400'}`}>
-                 {razonEstado || (isPausada ? 'Venta pausada temporalmente' : 'Rifa cancelada')}
-               </p>
+            <div className={`flex min-h-[44px] flex-col justify-center rounded-lg border p-2 text-center ${isPausada ? 'border-amber-100 bg-amber-50 dark:border-amber-900/30 dark:bg-amber-900/10' : 'border-red-100 bg-red-50 dark:border-red-900/30 dark:bg-red-900/10'}`}>
+              <p className={`text-[11px] font-bold leading-tight ${isPausada ? 'text-amber-700 dark:text-amber-400' : 'text-red-700 dark:text-red-400'}`}>
+                {razonEstado || (isPausada ? 'Venta pausada temporalmente' : 'Rifa cancelada')}
+              </p>
             </div>
           )}
-          
-          <div className="flex justify-between items-center text-sm font-medium">
-            <span className="text-slate-500 dark:text-slate-400 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+          <div className="flex items-center justify-between text-sm font-medium">
+            <span className="flex items-center text-slate-500 dark:text-slate-400">
+              <svg xmlns="http://www.w3.org/2000/svg" className="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               {formatSpanishDate(fechaSorteo)}
             </span>
           </div>
-          
-          <Link 
+
+          <Link
             href={`/rifas/${publicId}`}
-            className={`block w-full text-center font-semibold py-3 rounded-xl transition-colors shadow-md border ${
-              noActiva 
-                ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600' 
-                : 'bg-brand-600 hover:bg-brand-500 text-white shadow-brand-500/20 border-gold-300/20'
+            className={`block w-full rounded-xl border py-3 text-center font-bold shadow-md transition-all active:scale-[0.98] ${
+              noActiva
+                ? 'border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+                : 'border-gold-300/20 bg-brand-600 text-white shadow-brand-500/20 hover:bg-brand-500 hover:shadow-lg hover:shadow-brand-500/25'
             }`}
           >
-            {isFinalizada ? 'Ver Resultados' : isPausada ? 'Ver Detalles' : isCancelada ? 'Saber más' : 'Ver Rifa y Boletos'}
+            {isFinalizada ? 'Ver resultados' : isPausada ? 'Ver detalles' : isCancelada ? 'Saber más' : 'Ver rifa y boletos'}
           </Link>
         </div>
       </div>

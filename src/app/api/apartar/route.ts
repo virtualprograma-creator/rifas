@@ -114,7 +114,7 @@ export async function POST(req: Request) {
 
     const origin = req.headers.get('origin') || '';
     const ordenUrl = `${origin}/mis-boletos/${result.orden.id}`;
-    const whatsappUrl = generateWhatsAppMessage({
+    const whatsappUrl = await generateWhatsAppMessage({
       nombre,
       telefono,
       ciudad,

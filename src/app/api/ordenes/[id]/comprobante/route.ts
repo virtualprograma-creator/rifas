@@ -40,15 +40,15 @@ export async function POST(request: Request, { params }: Props) {
     const file = formData.get('comprobante');
 
     if (!(file instanceof File)) {
-      return NextResponse.json({ error: 'Selecciona un archivo valido' }, { status: 400 });
+      return NextResponse.json({ error: 'Selecciona un archivo válido' }, { status: 400 });
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: 'El comprobante no debe pesar mas de 5 MB' }, { status: 400 });
+      return NextResponse.json({ error: 'El comprobante no debe pesar más de 5 MB' }, { status: 400 });
     }
 
     if (!ALLOWED_TYPES.has(file.type)) {
-      return NextResponse.json({ error: 'Solo se aceptan imagenes JPG, PNG, WEBP o PDF' }, { status: 400 });
+      return NextResponse.json({ error: 'Solo se aceptan imágenes JPG, PNG, WEBP o PDF' }, { status: 400 });
     }
 
     const extension = file.name.split('.').pop()?.toLowerCase() || 'bin';
@@ -67,7 +67,7 @@ export async function POST(request: Request, { params }: Props) {
         data: {
           estado: 'EN_REVISION',
           comprobanteUrl,
-          notasPago: 'Comprobante enviado por el cliente. Pendiente de validacion.',
+          notasPago: 'Comprobante enviado por el cliente. Pendiente de validación.',
         },
       });
 
@@ -81,7 +81,7 @@ export async function POST(request: Request, { params }: Props) {
     });
 
     const origin = request.headers.get('origin') || '';
-    const adminWhatsappUrl = generateAdminComprobanteMessage({
+    const adminWhatsappUrl = await generateAdminComprobanteMessage({
       folio: displayFolio(orden),
       cliente: orden.cliente.nombre,
       rifaTitulo: orden.rifa.titulo,
@@ -95,7 +95,7 @@ export async function POST(request: Request, { params }: Props) {
       action: 'UPLOAD_RECEIPT',
       entityType: 'ORDEN',
       entityId: id,
-      summary: `${orden.cliente.nombre} subio comprobante para la orden ${displayFolio(orden)}`,
+      summary: `${orden.cliente.nombre} subió comprobante para la orden ${displayFolio(orden)}`,
       metadata: {
         folio: displayFolio(orden),
         comprobanteUrl,

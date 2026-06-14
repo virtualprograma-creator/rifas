@@ -4,6 +4,7 @@ import { AdminLayout } from '@/components/AdminLayout';
 import { AdminOrderActions } from '@/components/AdminOrderActions';
 import { OrderTicketsEditor } from '@/components/OrderTicketsEditor';
 import { TicketDownloader } from '@/components/TicketDownloader';
+import { AdminComprobanteViewer } from '@/components/AdminComprobanteViewer';
 import { prisma } from '@/lib/prisma';
 import { displayFolio } from '@/lib/folio';
 
@@ -42,7 +43,7 @@ export default async function AdminOrdenDetallePage({ params }: Props) {
       <div className="space-y-6">
         <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6">
           <Link href="/admin/ordenes" className="text-sm font-medium text-brand-600 hover:text-brand-500">
-            Volver a ordenes
+            Volver a órdenes
           </Link>
           <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div>
@@ -73,9 +74,9 @@ export default async function AdminOrdenDetallePage({ params }: Props) {
               <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">Datos de la orden</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <Info label="Cliente" value={orden.cliente.nombre} />
-                <Info label="Telefono" value={orden.cliente.telefono} />
+                <Info label="Teléfono" value={orden.cliente.telefono} />
                 <Info label="Correo" value={orden.cliente.correo || 'Sin correo'} />
-                <Info label="Ubicacion" value={`${orden.cliente.ciudad}, ${orden.cliente.estado}`} />
+                <Info label="Ubicación" value={`${orden.cliente.ciudad}, ${orden.cliente.estado}`} />
                 <Info label="Rifa" value={orden.rifa.titulo} />
                 <Info label="Total" value={currencyFormatter.format(orden.total)} />
                 <Info label="Banco elegido" value={orden.metodoPago?.banco || 'Sin seleccionar'} />
@@ -97,19 +98,10 @@ export default async function AdminOrdenDetallePage({ params }: Props) {
 
             <section className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6">
               <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">Comprobante</h3>
-              {orden.comprobanteUrl ? (
-                <a
-                  href={orden.comprobanteUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-medium text-brand-600 hover:text-brand-500"
-                >
-                  Abrir comprobante
-                </a>
-              ) : (
-                <p className="text-sm text-slate-500">No hay comprobante registrado.</p>
-              )}
-              {orden.notasPago && <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">{orden.notasPago}</p>}
+              <AdminComprobanteViewer
+                comprobanteUrl={orden.comprobanteUrl}
+                notasPago={orden.notasPago}
+              />
             </section>
           </div>
 
