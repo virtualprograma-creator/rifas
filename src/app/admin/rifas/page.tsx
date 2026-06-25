@@ -11,17 +11,28 @@ const currencyFormatter = new Intl.NumberFormat('es-MX', {
 });
 
 type Props = {
-  searchParams: Promise<{ q?: string; estado?: string }>;
+  searchParams: Promise<{ q?: string; estado?: string; tab?: string }>;
 };
 
 export default async function AdminRifasPage({ searchParams }: Props) {
-  const { q = '', estado = '' } = await searchParams;
+  const { q = '', estado = '', tab = 'rifas' } = await searchParams;
   const query = q.trim();
   const estadoFiltro = estado.trim().toUpperCase();
+  const enPapelera = tab === 'papelera';
+
+  // Contadores globales (independientes de filtros de búsqueda)
+  const [totalRifasActivas, totalPapelera] = await Promise.all([
+    prisma.rifa.count({ where: { estado: { not: 'CANCELADA' } } }),
+    prisma.rifa.count({ where: { estado: 'CANCELADA' } }),
+  ]);
 
   const rifas = await prisma.rifa.findMany({
     where: {
-      ...(estadoFiltro ? { estado: estadoFiltro } : {}),
+      ...(enPapelera
+        ? { estado: 'CANCELADA' }
+        : estadoFiltro
+          ? { estado: estadoFiltro }
+          : { estado: { not: 'CANCELADA' } }),
       ...(query
         ? {
             OR: [
@@ -43,15 +54,15 @@ export default async function AdminRifasPage({ searchParams }: Props) {
     },
   });
 
-  const activas = rifas.filter((rifa) => rifa.estado === 'ACTIVA').length;
-  const pausadas = rifas.filter((rifa) => rifa.estado === 'PAUSADA').length;
+  const activas = enPapelera ? 0 : rifas.filter((rifa) => rifa.estado === 'ACTIVA').length;
+  const pausadas = enPapelera ? 0 : rifas.filter((rifa) => rifa.estado === 'PAUSADA').length;
   const ordenes = rifas.reduce((sum, rifa) => sum + rifa._count.ordenes, 0);
 
   return (
     <AdminLayout>
       <div className="space-y-5">
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatCard label="Rifas" value={rifas.length.toString()} tone="blue" />
+          <StatCard label="Rifas" value={totalRifasActivas.toString()} tone="blue" />
           <StatCard label="Activas" value={activas.toString()} tone="green" />
           <StatCard label="Pausadas" value={pausadas.toString()} tone="amber" />
           <StatCard label="Órdenes" value={ordenes.toString()} tone="yellow" />
@@ -63,43 +74,94 @@ export default async function AdminRifasPage({ searchParams }: Props) {
               <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">Rifas</h2>
               <p className="mt-1 text-sm text-slate-500">Administra sorteos, boletos, visibilidad pública y órdenes.</p>
             </div>
+            {!enPapelera && (
+              <Link
+                href="/admin/rifas/nueva"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-600 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-brand-500 active:scale-[0.98]"
+              >
+                Nueva rifa
+              </Link>
+            )}
+          </div>
+
+          {/* Pestañas */}
+          <div className="relative z-10 mb-5 flex gap-1 rounded-xl border border-slate-200 bg-slate-100 p-1 dark:border-slate-700 dark:bg-slate-800/60">
             <Link
-              href="/admin/rifas/nueva"
-              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-600 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-brand-500 active:scale-[0.98]"
+              href="/admin/rifas"
+              className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-bold transition-all ${
+                !enPapelera
+                  ? 'bg-white shadow-sm text-slate-900 dark:bg-slate-700 dark:text-white'
+                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+              }`}
             >
-              Nueva rifa
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+              </svg>
+              Rifas
+              <span className={`rounded-full px-2 py-0.5 text-[11px] font-black ${!enPapelera ? 'bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300' : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300'}`}>
+                {totalRifasActivas}
+              </span>
+            </Link>
+            <Link
+              href="/admin/rifas?tab=papelera"
+              className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-bold transition-all ${
+                enPapelera
+                  ? 'bg-white shadow-sm text-red-600 dark:bg-slate-700 dark:text-red-400'
+                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+              }`}
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Papelera
+              {totalPapelera > 0 && (
+                <span className={`rounded-full px-2 py-0.5 text-[11px] font-black ${enPapelera ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300' : 'bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-400'}`}>
+                  {totalPapelera}
+                </span>
+              )}
             </Link>
           </div>
 
           <form className="relative z-10 mb-5 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_170px] lg:grid-cols-[1fr_180px_auto]">
+            <input type="hidden" name="tab" value={tab} />
             <input
               name="q"
               defaultValue={query}
               className="min-h-11 rounded-xl border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-brand-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
-              placeholder="Buscar título, categoría o descripción"
+              placeholder={enPapelera ? 'Buscar en la papelera…' : 'Buscar título, categoría o descripción'}
             />
-            <select
-              name="estado"
-              defaultValue={estadoFiltro}
-              className="min-h-11 rounded-xl border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-brand-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
-            >
-              <option value="">Todas</option>
-              <option value="ACTIVA">Activa</option>
-              <option value="PAUSADA">Pausada</option>
-              <option value="FINALIZADA">Finalizada</option>
-              <option value="CANCELADA">Eliminada</option>
-            </select>
-            <button className="min-h-11 rounded-xl bg-brand-600 px-5 text-sm font-bold text-white transition hover:bg-brand-500 active:scale-[0.98] sm:col-span-2 lg:col-span-1">
+            {!enPapelera && (
+              <select
+                name="estado"
+                defaultValue={estadoFiltro}
+                className="min-h-11 rounded-xl border border-slate-300 bg-slate-50 px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-brand-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+              >
+                <option value="">Todas</option>
+                <option value="ACTIVA">Activa</option>
+                <option value="PAUSADA">Pausada</option>
+                <option value="FINALIZADA">Finalizada</option>
+              </select>
+            )}
+            <button className={`min-h-11 rounded-xl bg-brand-600 px-5 text-sm font-bold text-white transition hover:bg-brand-500 active:scale-[0.98] ${enPapelera ? 'sm:col-span-1' : 'sm:col-span-2 lg:col-span-1'}`}>
               Filtrar
             </button>
           </form>
+
+          {enPapelera && (
+            <div className="relative z-10 mb-4 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
+              <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Las rifas en la papelera están ocultas al público. Puedes restaurarlas en cualquier momento.
+            </div>
+          )}
 
           <div className="relative z-10 space-y-3 lg:hidden">
             {rifas.map((rifa) => {
               const progress = progressPercent(rifa._count.boletos, rifa.cantidadBoletos);
 
               return (
-                <article key={rifa.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/30">
+                <article key={rifa.id} className={`rounded-xl border p-4 shadow-sm ${enPapelera ? 'border-red-200 bg-red-50/50 dark:border-red-500/20 dark:bg-red-500/5' : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/30'}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <h3 className="line-clamp-2 text-base font-black text-slate-900 dark:text-slate-100">{rifa.titulo}</h3>
@@ -121,11 +183,16 @@ export default async function AdminRifasPage({ searchParams }: Props) {
                         Ganador #{rifa.ganadorBoleto}
                       </span>
                     )}
+                    {rifa.razonEstado && enPapelera && (
+                      <span className="rounded-full bg-red-100 px-2 py-1 text-[11px] font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300">
+                        {rifa.razonEstado}
+                      </span>
+                    )}
                   </div>
 
                   <div className="mt-4">
                     <div className="mb-1 flex items-center justify-between text-xs">
-                      <span className="font-bold uppercase tracking-wide text-slate-400">Boletos ocupados</span>
+                      <span className="font-bold uppercase tracking-wide text-slate-400">Boletos</span>
                       <span className="font-bold text-slate-700 dark:text-slate-200">
                         {rifa._count.boletos}/{rifa.cantidadBoletos}
                       </span>
@@ -153,7 +220,9 @@ export default async function AdminRifasPage({ searchParams }: Props) {
                 </article>
               );
             })}
-            {rifas.length === 0 && <EmptyState text="No hay rifas creadas aún." />}
+            {rifas.length === 0 && (
+              <EmptyState text={enPapelera ? 'La papelera está vacía.' : 'No hay rifas creadas aún.'} />
+            )}
           </div>
 
           <div className="relative z-10 hidden overflow-x-auto lg:block">
@@ -162,9 +231,8 @@ export default async function AdminRifasPage({ searchParams }: Props) {
                 <tr className="border-b border-slate-200 dark:border-slate-800">
                   <TableHead>Título</TableHead>
                   <TableHead>Estado</TableHead>
-                  <TableHead>Progreso</TableHead>
+                  <TableHead>Precio · Boletos · Disponibles</TableHead>
                   <TableHead>Órdenes</TableHead>
-                  <TableHead>Precio</TableHead>
                   <TableHead>Sorteo</TableHead>
                   <TableHead>Acciones</TableHead>
                 </tr>
@@ -174,7 +242,7 @@ export default async function AdminRifasPage({ searchParams }: Props) {
                   const progress = progressPercent(rifa._count.boletos, rifa.cantidadBoletos);
 
                   return (
-                    <tr key={rifa.id} className="border-b border-slate-100 transition-colors last:border-0 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-white/5">
+                    <tr key={rifa.id} className={`border-b border-slate-100 transition-colors last:border-0 ${enPapelera ? 'hover:bg-red-50/40 dark:hover:bg-red-500/5' : 'hover:bg-slate-50 dark:hover:bg-white/5'} dark:border-slate-800`}>
                       <td className="max-w-80 px-4 py-3">
                         <div className="font-bold text-slate-800 dark:text-slate-200">{rifa.titulo}</div>
                         <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -184,6 +252,11 @@ export default async function AdminRifasPage({ searchParams }: Props) {
                               Stats ocultas
                             </span>
                           )}
+                          {rifa.razonEstado && enPapelera && (
+                            <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-600 dark:bg-red-500/15 dark:text-red-400">
+                              {rifa.razonEstado}
+                            </span>
+                          )}
                         </div>
                       </td>
                       <td className="px-4 py-3">
@@ -191,17 +264,19 @@ export default async function AdminRifasPage({ searchParams }: Props) {
                           {statusLabel(rifa.estado)}
                         </span>
                       </td>
-                      <td className="min-w-52 px-4 py-3">
-                        <div className="mb-1 flex items-center justify-between text-xs text-slate-500">
-                          <span>{rifa._count.boletos}/{rifa.cantidadBoletos}</span>
-                          <span>{progress}%</span>
+                      <td className="min-w-64 px-4 py-3">
+                        <div className="mb-1.5 flex items-center gap-3 text-xs">
+                          <span className="font-black text-slate-800 dark:text-slate-100">{currencyFormatter.format(rifa.precioBoleto)}</span>
+                          <span className="text-slate-400">·</span>
+                          <span className="text-slate-500">{rifa._count.boletos}/{rifa.cantidadBoletos} boletos</span>
+                          <span className="text-slate-400">·</span>
+                          <span className="text-slate-500">{rifa.cantidadBoletos - rifa._count.boletos} disp.</span>
                         </div>
-                        <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+                        <div className="h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                           <div className="progress-premium h-full rounded-full" style={{ width: `${progress}%` }} />
                         </div>
                       </td>
                       <td className="px-4 py-3 font-bold text-slate-700 dark:text-slate-200">{rifa._count.ordenes}</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{currencyFormatter.format(rifa.precioBoleto)}</td>
                       <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
                         {new Date(rifa.fechaSorteo).toLocaleDateString('es-MX')}
                       </td>
@@ -218,8 +293,8 @@ export default async function AdminRifasPage({ searchParams }: Props) {
                 })}
                 {rifas.length === 0 && (
                   <tr>
-                    <td colSpan={7}>
-                      <EmptyState text="No hay rifas creadas aún." />
+                    <td colSpan={6}>
+                      <EmptyState text={enPapelera ? 'La papelera está vacía.' : 'No hay rifas creadas aún.'} />
                     </td>
                   </tr>
                 )}

@@ -83,14 +83,11 @@ export default async function RifaDetailPage({ params }: Props) {
 
               {rifa.estado === 'ACTIVA' ? (
                 <div className="space-y-6">
-                  <div className={`grid grid-cols-2 gap-3 ${mostrarEstadisticasPublicas ? 'md:grid-cols-4' : ''}`}>
+                  <div className="grid grid-cols-3 gap-3">
                     <Metric label="Precio" value={`$${rifa.precioBoleto.toFixed(2)}`} tone="gold" />
                     <Metric label="Boletos" value={rifa.cantidadBoletos.toString()} tone="slate" />
                     {mostrarEstadisticasPublicas && (
-                      <>
-                        <Metric label="Disponibles" value={disponibles.toString()} tone="green" />
-                        <Metric label="Vendido" value={`${porcentaje}%`} tone="brand" />
-                      </>
+                      <Metric label="Disponibles" value={disponibles.toString()} tone="green" />
                     )}
                   </div>
 
