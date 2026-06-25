@@ -20,7 +20,7 @@ export function AdminComprobanteViewer({ comprobanteUrl, notasPago }: AdminCompr
     );
   }
 
-  const isPdf = comprobanteUrl.toLowerCase().endsWith('.pdf');
+  const isPdf = comprobanteUrl.toLowerCase().endsWith('.pdf') || comprobanteUrl.startsWith('data:application/pdf');
 
   return (
     <>

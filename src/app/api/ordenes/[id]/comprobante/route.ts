@@ -1,6 +1,3 @@
-import { randomUUID } from 'crypto';
-import { mkdir, writeFile } from 'fs/promises';
-import path from 'path';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { displayFolio } from '@/lib/folio';
@@ -51,16 +48,10 @@ export async function POST(request: Request, { params }: Props) {
       return NextResponse.json({ error: 'Solo se aceptan imágenes JPG, PNG, WEBP o PDF' }, { status: 400 });
     }
 
-    const extension = file.name.split('.').pop()?.toLowerCase() || 'bin';
-    const fileName = `${id}-${randomUUID()}.${extension}`;
     const bytes = await file.arrayBuffer();
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'comprobantes');
-    const uploadPath = path.join(uploadDir, fileName);
-
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(uploadPath, Buffer.from(bytes));
-
-    const comprobanteUrl = `/uploads/comprobantes/${fileName}`;
+    const buffer = Buffer.from(bytes);
+    const base64Data = buffer.toString('base64');
+    const comprobanteUrl = `data:${file.type};base64,${base64Data}`;
     await prisma.$transaction(async (tx) => {
       await tx.orden.update({
         where: { id },
