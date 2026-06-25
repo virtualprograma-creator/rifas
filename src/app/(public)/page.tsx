@@ -25,9 +25,8 @@ export default async function Home() {
         <div className="absolute inset-0 opacity-[0.08] bg-[linear-gradient(45deg,transparent_25%,#f8c94a_25%,#f8c94a_26%,transparent_26%,transparent_50%,#f8c94a_50%,#f8c94a_51%,transparent_51%,transparent_75%,#f8c94a_75%,#f8c94a_76%,transparent_76%)] bg-size-[32px_32px]"></div>
 
         <div className="relative z-10 mx-auto max-w-6xl text-center">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-gold-300 sm:text-sm">Rifas premium</p>
           <h1 className="mx-auto mb-4 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-6xl">
-            Participa y Gana <span className="text-gold-300">Grandes Premios</span>
+            ¡GRAN RIFA!
           </h1>
           <p className="mx-auto max-w-xl text-base leading-7 text-brand-100 sm:text-lg md:text-xl">
             Explora rifas activas, aparta tus boletos y vive la experiencia de una rifa clara, elegante y segura.
