@@ -5,8 +5,8 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
   return (
     <div className="flex min-h-screen flex-col">
       <nav className="border-b border-gold-500/25 bg-[#052d20] shadow-sm">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2 transition-transform hover:scale-105 active:scale-95">
+        <div className="relative mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+          <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:static md:translate-x-0 md:translate-y-0 flex items-center gap-2 transition-transform hover:scale-105 active:scale-95">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold-400 shadow-lg shadow-gold-500/30">
               <svg className="h-5 w-5 text-brand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
