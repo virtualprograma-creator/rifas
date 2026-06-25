@@ -88,53 +88,67 @@ export default async function MisBoletosPage({ params }: Props) {
     <main className="min-h-screen bg-[#eef8f2] px-4 py-8 dark:bg-[#071710] sm:py-10">
       <div className="mx-auto max-w-6xl">
         <section className="premium-card rounded-3xl bg-white p-5 shadow-xl dark:bg-[#0b2419] sm:p-7">
+          {/* Header & Ticket numbers above the 2-column grid to look great and save mobile height */}
+          <div className="mb-6 border-b border-slate-100 pb-5 dark:border-slate-800">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-brand-600 dark:text-gold-300 sm:text-xs">Tus boletos</p>
+                <h1 className="mt-1 text-xl font-black text-slate-950 dark:text-white sm:text-3xl">
+                  {orden.cliente.nombre}
+                </h1>
+              </div>
+              <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider sm:px-3 sm:py-1 sm:text-xs ${estado.className}`}>
+                {estado.label}
+              </span>
+            </div>
+
+            <div className="rounded-2xl border-2 border-dashed border-gold-400/60 bg-gold-50/40 p-4 text-center dark:bg-gold-900/10 sm:p-5">
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400 sm:text-xs">Números apartados</p>
+              <p className="mt-2 text-lg font-black leading-relaxed text-brand-900 dark:text-gold-100 sm:mt-3 sm:text-2xl">
+                {boletos.join(', ')}
+              </p>
+              <p className="mt-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 sm:mt-4 sm:text-xs">Folio: {folio}</p>
+            </div>
+          </div>
+
           <div className="relative z-10 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
             <div>
-              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.24em] text-brand-600 dark:text-gold-300">Tus boletos</p>
-                  <h1 className="mt-1 text-2xl font-black text-slate-950 dark:text-white sm:text-4xl">
-                    {orden.cliente.nombre}
-                  </h1>
+              {/* Detailed info grid, compact for mobile */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="col-span-2">
+                  <Info label="Rifa" value={orden.rifa.titulo} />
                 </div>
-                <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-wider ${estado.className}`}>
-                  {estado.label}
-                </span>
-              </div>
-
-              <div className="rounded-2xl border-2 border-dashed border-gold-400/60 bg-gold-50/40 p-5 text-center dark:bg-gold-900/10">
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">Números apartados</p>
-                <p className="mt-3 text-2xl font-black leading-relaxed text-brand-900 dark:text-gold-100">
-                  {boletos.join(', ')}
-                </p>
-                <p className="mt-4 text-xs font-semibold uppercase tracking-widest text-slate-400">Folio: {folio}</p>
-              </div>
-
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <Info label="Rifa" value={orden.rifa.titulo} />
-                <Info label="Total" value={currencyFormatter.format(orden.total)} strong />
-                <Info label="Estado de pago" value={estado.paymentLabel} />
-                <Info
-                  label="Vence"
-                  value={orden.expiresAt ? new Date(orden.expiresAt).toLocaleString('es-MX') : 'Sin vencimiento'}
-                />
-              </div>
-
-              <div className="mt-3 rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                <div className="text-xs font-bold uppercase tracking-wide text-slate-500">Tiempo restante</div>
-                <div className="mt-1 text-lg font-black text-slate-900 dark:text-slate-100">
-                  <OrderCountdown expiresAt={orden.expiresAt?.toISOString() || null} />
+                <div className="col-span-1">
+                  <Info label="Total" value={currencyFormatter.format(orden.total)} strong />
+                </div>
+                <div className="col-span-1">
+                  <Info label="Estado de pago" value={estado.paymentLabel} />
+                </div>
+                <div className="col-span-2">
+                  <Info
+                    label="Vence"
+                    value={orden.expiresAt ? new Date(orden.expiresAt).toLocaleString('es-MX') : 'Sin vencimiento'}
+                  />
+                </div>
+                <div className="col-span-2">
+                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/50 sm:p-4">
+                    <div className="text-[10px] font-bold uppercase tracking-wide text-slate-500 sm:text-xs">Tiempo restante</div>
+                    <div className="mt-1 text-sm font-black text-slate-900 dark:text-slate-100 sm:text-base">
+                      <OrderCountdown expiresAt={orden.expiresAt?.toISOString() || null} />
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {/* Action buttons (WhatsApp / Download PDF) */}
+              <div className="mt-4 grid grid-cols-2 gap-3">
                 <a
                   href={whatsappUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex min-h-12 items-center justify-center rounded-xl bg-[#079b89] px-5 font-extrabold uppercase text-white shadow-lg shadow-teal-900/10 transition hover:bg-[#087f72] active:scale-[0.98]"
+                  className="flex min-h-12 items-center justify-center rounded-xl bg-[#079b89] px-2 py-2 text-center text-xs font-extrabold uppercase text-white shadow-lg shadow-teal-900/10 transition hover:bg-[#087f72] active:scale-[0.98] sm:px-5 sm:text-sm"
                 >
-                  Enviar a WhatsApp
+                  <span className="leading-tight">WhatsApp</span>
                 </a>
 
                 <TicketDownloader
@@ -201,9 +215,9 @@ function getOrderStatus(status: string) {
 
 function Info({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
   return (
-    <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-      <div className="text-xs font-bold uppercase tracking-wide text-slate-500">{label}</div>
-      <div className={`mt-1 text-slate-900 dark:text-slate-100 ${strong ? 'text-xl font-black text-brand-700 dark:text-gold-300' : 'font-semibold'}`}>
+    <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/50 sm:p-4">
+      <div className="text-[10px] font-bold uppercase tracking-wide text-slate-500 sm:text-xs">{label}</div>
+      <div className={`mt-1 text-slate-900 dark:text-slate-100 ${strong ? 'text-base font-black text-brand-700 dark:text-gold-300 sm:text-lg' : 'text-xs font-semibold sm:text-sm'}`}>
         {value}
       </div>
     </div>

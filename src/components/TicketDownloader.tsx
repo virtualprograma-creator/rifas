@@ -124,10 +124,10 @@ export function TicketDownloader({ orden, variant = 'public' }: TicketDownloader
   return (
     <button
       onClick={downloadTicket}
-      className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-[#079b89] bg-white px-5 font-extrabold uppercase text-[#079b89] transition hover:bg-teal-50 active:scale-[0.98]"
+      className="flex min-h-12 w-full items-center justify-center gap-1.5 rounded-xl border-2 border-[#079b89] bg-white px-2 py-2 text-center text-xs font-extrabold uppercase text-[#079b89] transition hover:bg-teal-50 active:scale-[0.98] sm:gap-2 sm:px-5 sm:text-sm"
     >
       <DownloadIcon />
-      Descargar boletos (PDF)
+      <span className="leading-tight">Descargar PDF</span>
     </button>
   );
 }
