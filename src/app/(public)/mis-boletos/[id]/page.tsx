@@ -114,7 +114,7 @@ export default async function MisBoletosPage({ params }: Props) {
           <div className="relative z-10 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
             <div>
               {/* Detailed info grid, compact for mobile */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
                 <div className="col-span-2">
                   <Info label="Rifa" value={orden.rifa.titulo} />
                 </div>
@@ -131,9 +131,9 @@ export default async function MisBoletosPage({ params }: Props) {
                   />
                 </div>
                 <div className="col-span-2">
-                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/50 sm:p-4">
+                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-2.5 dark:border-slate-800 dark:bg-slate-900/50 sm:p-4">
                     <div className="text-[10px] font-bold uppercase tracking-wide text-slate-500 sm:text-xs">Tiempo restante</div>
-                    <div className="mt-1 text-sm font-black text-slate-900 dark:text-slate-100 sm:text-base">
+                    <div className="mt-1 text-xs font-black text-slate-900 dark:text-slate-100 sm:text-base">
                       <OrderCountdown expiresAt={orden.expiresAt?.toISOString() || null} />
                     </div>
                   </div>
@@ -141,7 +141,7 @@ export default async function MisBoletosPage({ params }: Props) {
               </div>
 
               {/* Action buttons (WhatsApp / Download PDF) */}
-              <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="mt-3 grid grid-cols-2 gap-2.5 sm:gap-3">
                 <a
                   href={whatsappUrl}
                   target="_blank"
@@ -215,7 +215,7 @@ function getOrderStatus(status: string) {
 
 function Info({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
   return (
-    <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/50 sm:p-4">
+    <div className="rounded-xl border border-slate-100 bg-slate-50 p-2.5 dark:border-slate-800 dark:bg-slate-900/50 sm:p-4">
       <div className="text-[10px] font-bold uppercase tracking-wide text-slate-500 sm:text-xs">{label}</div>
       <div className={`mt-1 text-slate-900 dark:text-slate-100 ${strong ? 'text-base font-black text-brand-700 dark:text-gold-300 sm:text-lg' : 'text-xs font-semibold sm:text-sm'}`}>
         {value}
