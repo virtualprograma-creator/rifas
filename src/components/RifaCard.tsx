@@ -43,7 +43,7 @@ export function RifaCard({
 
   return (
     <div className={`premium-card gold-shine group flex h-full flex-col overflow-hidden rounded-2xl bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl dark:bg-[#0b2419] ${noActiva ? 'opacity-90' : ''}`}>
-      <div className="relative aspect-[16/10] w-full overflow-hidden sm:aspect-[16/9]">
+      <Link href={`/rifas/${publicId}`} className="relative block aspect-[16/10] w-full overflow-hidden sm:aspect-[16/9]">
         <Image
           src={imagenUrl || '/placeholder.jpg'}
           alt={titulo}
@@ -87,10 +87,14 @@ export function RifaCard({
             </div>
           </>
         )}
-      </div>
+      </Link>
 
       <div className="relative z-10 flex flex-grow flex-col p-5">
-        <h3 className="mb-2 text-xl font-black text-brand-900 dark:text-gold-100">{titulo}</h3>
+        <h3 className="mb-2 text-xl font-black text-brand-900 dark:text-gold-100">
+          <Link href={`/rifas/${publicId}`} className="hover:text-brand-700 dark:hover:text-gold-300 transition-colors">
+            {titulo}
+          </Link>
+        </h3>
         <p className="mb-4 line-clamp-2 text-sm text-slate-500 dark:text-slate-400">{descripcionCorta}</p>
 
         <div className="mt-auto space-y-4">
