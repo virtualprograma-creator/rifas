@@ -12,7 +12,7 @@ export function MobileMenu() {
         onClick={() => setIsOpen(!isOpen)}
         className="cursor-pointer select-none p-2 text-white transition-colors hover:text-gold-300"
         aria-label="Alternar menú"
-        aria-expanded={isOpen}
+        aria-expanded={isOpen ? 'true' : 'false'}
       >
         {!isOpen ? (
           <svg className="block h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,6 +35,9 @@ export function MobileMenu() {
           </Link>
           <Link href="/preguntas-frecuentes" onClick={() => setIsOpen(false)} className="text-2xl font-bold text-white transition-colors hover:text-gold-300">
             Preguntas frecuentes
+          </Link>
+          <Link href="/admin" onClick={() => setIsOpen(false)} className="text-2xl font-bold text-white transition-colors hover:text-gold-300">
+            Administración
           </Link>
         </div>
       )}

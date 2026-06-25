@@ -27,13 +27,16 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <Link href="/preguntas-frecuentes" className="text-sm font-semibold text-brand-50 transition-colors hover:text-gold-300">
               Preguntas frecuentes
             </Link>
+            <Link href="/admin" className="text-sm font-semibold text-brand-50 transition-colors hover:text-gold-300">
+              Administración
+            </Link>
           </div>
 
           <MobileMenu />
         </div>
       </nav>
 
-      <div className="flex-grow">{children}</div>
+      <div className="grow">{children}</div>
 
       <footer className="border-t border-gold-500/20 bg-[#052d20] px-4 py-8 text-center">
         <p className="text-sm text-brand-100/70">
