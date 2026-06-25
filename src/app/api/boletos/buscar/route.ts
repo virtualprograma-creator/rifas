@@ -117,8 +117,8 @@ export async function GET(request: NextRequest) {
       numeroFormateado: boleto.numeroFormateado,
       estado: boleto.estado,
       estadoTexto: ESTADOS_PUBLICOS[boleto.estado] ?? boleto.estado,
-      folio: boleto.orden ? displayFolio(boleto.orden) : null,
-      ordenUrl: boleto.orden ? `/mis-boletos/${boleto.orden.id}` : null,
+      folio: null, // Ocultado por seguridad al buscar por número de boleto
+      ordenUrl: null, // Ocultado por seguridad al buscar por número de boleto
       rifa: {
         ...boleto.rifa,
         fechaSorteo: boleto.rifa.fechaSorteo.toISOString(),
