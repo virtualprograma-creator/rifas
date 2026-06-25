@@ -169,9 +169,9 @@ function Metric({ label, value, tone }: { label: string; value: string; tone: 'g
   }[tone];
 
   return (
-    <div className="rounded-xl border border-slate-100 bg-white/70 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/30">
-      <div className="mb-1 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</div>
-      <div className={`truncate text-2xl font-black ${toneClass}`}>{value}</div>
+    <div className="rounded-xl border border-slate-100 bg-white/70 p-2.5 sm:p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/30">
+      <div className="mb-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</div>
+      <div className={`truncate text-lg sm:text-2xl font-black ${toneClass}`}>{value}</div>
     </div>
   );
 }
