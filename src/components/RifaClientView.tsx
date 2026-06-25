@@ -121,6 +121,10 @@ export function RifaClientView({ rifaId, precioBoleto, boletos }: RifaClientView
               <button
                 type="button"
                 onClick={() => {
+                  const match = success.ordenUrl.match(/\/mis-boletos\/([a-zA-Z0-9]+)/);
+                  if (match && match[1]) {
+                    document.cookie = `order_verified_${match[1]}=true; path=/; max-age=31536000; SameSite=Lax`;
+                  }
                   window.location.href = success.ordenUrl;
                 }}
                 className="min-h-12 rounded-2xl bg-brand-600 px-8 font-extrabold uppercase text-white shadow-lg shadow-brand-700/20 transition hover:bg-brand-500"

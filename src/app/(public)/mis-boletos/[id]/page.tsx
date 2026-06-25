@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { ComprobanteUploadForm } from '@/components/ComprobanteUploadForm';
 import { PaymentMethods } from '@/components/PaymentMethods';
 import { OrderCountdown } from '@/components/OrderCountdown';
 import { TicketDownloader } from '@/components/TicketDownloader';
+import { OrderLockScreen } from '@/components/OrderLockScreen';
 import { prisma } from '@/lib/prisma';
 import { generateWhatsAppMessage } from '@/lib/whatsapp';
 import { displayFolio } from '@/lib/folio';
@@ -41,6 +43,30 @@ export default async function MisBoletosPage({ params }: Props) {
 
   if (!orden) {
     notFound();
+  }
+
+  const cookieStore = await cookies();
+  const isVerified = cookieStore.get(`order_verified_${id}`)?.value === 'true';
+
+  if (!isVerified) {
+    const verifyPhone = async (phone: string) => {
+      'use server';
+      const normalizedInput = phone.replace(/\D/g, '');
+      const normalizedDb = orden.cliente.telefono.replace(/\D/g, '');
+
+      if (normalizedInput.length >= 4 && (normalizedDb === normalizedInput || normalizedDb.endsWith(normalizedInput))) {
+        const cStore = await cookies();
+        cStore.set(`order_verified_${id}`, 'true', {
+          path: '/',
+          maxAge: 60 * 60 * 24 * 365,
+          sameSite: 'lax',
+        });
+        return { success: true };
+      }
+      return { success: false, error: 'El número de teléfono no coincide.' };
+    };
+
+    return <OrderLockScreen onVerify={verifyPhone} />;
   }
 
   const boletos = orden.boletos.map((boleto) => boleto.numeroFormateado);
