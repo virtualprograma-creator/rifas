@@ -99,7 +99,18 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          <div className="border-t border-slate-200 p-4 dark:border-slate-800">
+          <div className="flex flex-col gap-2 border-t border-slate-200 p-4 dark:border-slate-800">
+            <Link
+              href="/"
+              className="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white transition-all"
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500 group-hover:text-brand-600 dark:bg-white/5 dark:text-slate-300">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+              </span>
+              Ver sitio web
+            </Link>
             <AdminLogoutButton />
           </div>
         </div>
@@ -119,10 +130,22 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             <h1 className="truncate text-base font-extrabold text-slate-900 dark:text-white lg:text-xl">{currentTitle}</h1>
           </div>
 
-          <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white py-1 pl-3 pr-1 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-            <span className="hidden text-xs font-bold uppercase tracking-wider text-slate-500 sm:inline">Admin</span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-sm font-extrabold text-white shadow-sm shadow-brand-900/20">
-              A
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-750 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-white/5 shadow-sm"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+              Ver sitio
+            </Link>
+
+            <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white py-1 pl-3 pr-1 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+              <span className="hidden text-xs font-bold uppercase tracking-wider text-slate-500 sm:inline">Admin</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-sm font-extrabold text-white shadow-sm shadow-brand-900/20">
+                A
+              </div>
             </div>
           </div>
         </header>
